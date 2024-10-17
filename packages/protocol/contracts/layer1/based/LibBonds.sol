@@ -15,21 +15,21 @@ library LibBonds {
 
     error InsufficientBondBalance();
 
-    /// @dev Deposits Taiko token to be used as bonds.
+    /// @dev Deposits Ether to be used as bonds.
     /// @param _state Current TaikoData.State.
     /// @param _amount The amount of token to deposit.
     function depositBond(TaikoData.State storage _state, uint256 _amount) internal {
         _state.bondBalance[msg.sender] += _amount;
     }
 
-    /// @dev Withdraws Taiko token.
+    /// @dev Withdraws Ether deposited as bonds.
     /// @param _state Current TaikoData.State.
     /// @param _amount The amount of token to withdraw.
     function withdrawBond(TaikoData.State storage _state, uint256 _amount) internal {
         _state.bondBalance[msg.sender] -= _amount;
     }
 
-    /// @dev Debits Taiko tokens as bonds.
+    /// @dev Debits Ether as bonds.
     /// @param _state Current TaikoData.State.
     /// @param _user The user address to debit.
     /// @param _amount The amount of token to debit.
@@ -46,7 +46,7 @@ library LibBonds {
         emit BondDebited(_user, _amount);
     }
 
-    /// @dev Credits Taiko tokens to user's bond balance.
+    /// @dev Credits Ether to user's bond balance.
     /// @param _state Current TaikoData.State.
     /// @param _user The user address to credit.
     /// @param _amount The amount of token to credit.
@@ -55,7 +55,7 @@ library LibBonds {
         emit BondCredited(_user, _amount);
     }
 
-    /// @dev Gets a user's current Taiko token bond balance.
+    /// @dev Gets a user's current Ether bond balance.
     /// @param _state Current TaikoData.State.
     /// @param _user The user address to credit.
     /// @return  The current token balance.
