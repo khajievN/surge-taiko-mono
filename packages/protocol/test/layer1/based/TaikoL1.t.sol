@@ -229,6 +229,11 @@ contract TaikoL1Tests is TaikoL1TestBase {
         cp.getTier(123);
     }
 
+    function test_taikol1_insufficientBondBalance() external {
+        giveEthAndDepositBond(Alice, 0 ether); // No bond balance
+        proposeButRevert(Alice, 1024, LibBonds.InsufficientBondBalance.selector);
+    }
+
     function proposeButRevert(address proposer, uint24 txListSize, bytes4 revertReason) internal {
         uint256 msgValue = 2 ether;
         TaikoData.HookCall[] memory hookcalls = new TaikoData.HookCall[](0);
