@@ -87,8 +87,7 @@ interface ITaikoL1 {
         returns (TaikoData.TransitionState memory);
 
     /// @notice Deposits Taiko token to be used as bonds.
-    /// @param _amount The amount of Taiko token to deposit.
-    function depositBond(uint256 _amount) external;
+    function depositBond() external payable;
 
     /// @notice Withdraws Taiko token.
     /// @param _amount The amount of Taiko token to withdraw.
