@@ -573,6 +573,12 @@ func (p *Proposer) getPriorityGasPrice(tx *types.Transaction) (*big.Int, error) 
 	return new(big.Int).Sub(tx.GasPrice(), baseFee), nil
 }
 
+func adjustForPriceFluctuation(gasPrice *big.Int, percentage int64) *big.Int {
+
+	temp := new(big.Int).Mul(gasPrice, big.NewInt(100+percentage))
+	return new(big.Int).Div(temp, big.NewInt(100))
+}
+
 // Sum of all transactions in block > Total costs
 // Total Costs =
 // (gas needed for block proposal + gas needed for proof verification ) *
@@ -596,10 +602,7 @@ func (p *Proposer) estimateTotalCosts(gasUsed uint64) (*big.Int, error) {
 		return nil, err
 	}
 
-	// Add 50% to l1GasPrice to account for price fluctuation
-	adjustedL1GasPrice := new(big.Int).Mul(l1GasPrice, big.NewInt(3))
-	adjustedL1GasPrice.Div(adjustedL1GasPrice, big.NewInt(2))
-
+	adjustedL1GasPrice := adjustForPriceFluctuation(l1GasPrice, 50)
 	l1Costs := new(big.Int).Mul(totalL1GasNeeded, adjustedL1GasPrice)
 
 	// TODO: how to get these?
