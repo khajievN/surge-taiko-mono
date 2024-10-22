@@ -14,6 +14,7 @@ library LibBonds {
     event BondDebited(address indexed user, uint256 amount);
 
     error InsufficientBondBalance();
+    error FailedEthTransfer();
 
     /// @dev Deposits Ether to be used as bonds.
     /// @param _state Current TaikoData.State.
@@ -27,6 +28,10 @@ library LibBonds {
     /// @param _amount The amount of token to withdraw.
     function withdrawBond(TaikoData.State storage _state, uint256 _amount) internal {
         _state.bondBalance[msg.sender] -= _amount;
+        (bool success,) = (msg.sender).call{ value: _amount }("");
+        if (!success) {
+            revert FailedEthTransfer();
+        }
     }
 
     /// @dev Debits Ether as bonds.
