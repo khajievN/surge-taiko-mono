@@ -544,6 +544,8 @@ func (p *Proposer) isProfitable(txList types.Transactions) (bool, error) {
 	totalGasConsumed := uint64(0)
 
 	for _, tx := range txList {
+		// TODO: Not sure if this is the best approach here.
+		// Maybe txList.EstimatedGasUsed is useful? Maybe we need to calculate it ourselves?
 		gasConsumed := tx.Gas()
 		priorityGasPrice, err := p.getPriorityGasPrice(tx)
 		if err != nil {
