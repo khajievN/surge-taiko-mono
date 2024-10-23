@@ -244,10 +244,10 @@ abstract contract TaikoL1TestBase is TaikoTest {
         signature = abi.encodePacked(r, s, v);
     }
 
-    function giveEthAndDepositBond(address to, uint256 amountEth) internal {
-        vm.deal(to, amountEth + 1000 ether); // Extra eth compensates for block proposals
+    function giveEthAndDepositBond(address to, uint256 bondEth, uint256 proposalsEth) internal {
+        vm.deal(to, bondEth + proposalsEth);
         vm.prank(to);
-        L1.depositBond{ value: amountEth }();
+        L1.depositBond{ value: bondEth }();
 
         console2.log("ETH balance:", to, to.balance);
     }

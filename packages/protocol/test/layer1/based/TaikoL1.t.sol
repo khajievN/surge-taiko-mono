@@ -32,12 +32,12 @@ contract TaikoL1Tests is TaikoL1TestBase {
     /// @dev Test we can propose, prove, then verify more blocks than
     /// 'blockMaxProposals'
     function test_L1_more_blocks_than_ring_buffer_size() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
         // This is a very weird test (code?) issue here.
         // If this line (or Bob's query balance) is uncommented,
         // Alice/Bob has no balance.. (Causing reverts !!!)
-        giveEthAndDepositBond(Bob, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Bob, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
 
@@ -64,9 +64,9 @@ contract TaikoL1Tests is TaikoL1TestBase {
     /// @dev Test more than one block can be proposed, proven, & verified in the
     ///      same L1 block.
     function test_L1_multiple_blocks_in_one_L1_block() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
 
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
 
@@ -98,8 +98,8 @@ contract TaikoL1Tests is TaikoL1TestBase {
 
     /// @dev Test verifying multiple blocks in one transaction
     function test_L1_verifying_multiple_blocks_once() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
 
@@ -124,8 +124,8 @@ contract TaikoL1Tests is TaikoL1TestBase {
 
     /// @dev Test if a given transition deadline is based on proposal time
     function test_L1_in_proving_window_logic() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
 
@@ -187,8 +187,8 @@ contract TaikoL1Tests is TaikoL1TestBase {
 
         TaikoData.BlockMetadata memory meta;
 
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Bob, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Bob, 1000 ether, 1000 ether);
 
         // Proposing is still possible
         (meta,) = proposeBlock(Alice, 1024);
@@ -205,7 +205,7 @@ contract TaikoL1Tests is TaikoL1TestBase {
     }
 
     function test_unpause() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
 
         L1.pause();
 
@@ -230,7 +230,7 @@ contract TaikoL1Tests is TaikoL1TestBase {
     }
 
     function test_taikol1_insufficientBondBalance() external {
-        giveEthAndDepositBond(Alice, 0 ether); // No bond balance
+        giveEthAndDepositBond(Alice, 0 ether, 1000 ether); // No bond balance
         proposeButRevert(Alice, 1024, LibBonds.InsufficientBondBalance.selector);
     }
 

@@ -46,8 +46,8 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
     }
 
     function test_L1_ContestingWithSameProof() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
@@ -87,8 +87,8 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
     }
 
     function test_L1_ContestingWithDifferentButCorrectProof() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
@@ -132,8 +132,8 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
     }
 
     function test_L1_ContestingWithSgxProof() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
@@ -176,8 +176,8 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
     }
 
     function test_L1_ContestingWithDifferentButInCorrectProof() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
@@ -225,8 +225,8 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
     }
 
     function test_L1_ContestingWithInvalidBlockHash() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
@@ -282,10 +282,10 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
     }
 
     function test_L1_NonAssignedProverCannotBeFirstInProofWindowTime() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
 
@@ -318,8 +318,8 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
     }
 
     function test_L1_GuardianProverCanAlwaysOverwriteTheProof() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
@@ -372,8 +372,8 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
     }
 
     function test_L1_GuardianProverFailsWithInvalidBlockHash() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
@@ -416,8 +416,8 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
         uint64 syncInternal = L1.getConfig().stateRootSyncInternal;
         console2.log("syncInternal:", syncInternal);
 
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
@@ -472,8 +472,8 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
     function test_L1_ProveWithInvalidBlockId() external {
         registerAddress("guardian_prover", Alice);
 
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
@@ -505,11 +505,11 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
     function test_L1_ProveWithInvalidMetahash() external {
         registerAddress("guardian_prover", Alice);
 
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
-        giveEthAndDepositBond(Bob, 1000 ether);
+        giveEthAndDepositBond(Bob, 1000 ether, 1000 ether);
         console2.log("Bob balance:", L1.bondBalanceOf(Bob));
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
@@ -540,8 +540,8 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
     }
 
     function test_L1_GuardianProofCannotBeOverwrittenByLowerTier() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;
@@ -584,8 +584,8 @@ contract TaikoL1LibProvingWithTiers is TaikoL1TestBase {
     }
 
     function test_L1_ContestingWithLowerTierProofReverts() external {
-        giveEthAndDepositBond(Alice, 1000 ether);
-        giveEthAndDepositBond(Carol, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Carol, 1000 ether, 1000 ether);
         console2.log("Alice balance:", L1.bondBalanceOf(Alice));
 
         bytes32 parentHash = GENESIS_BLOCK_HASH;

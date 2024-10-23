@@ -13,9 +13,9 @@ contract TaikoL1TestGroup4 is TaikoL1TestGroupBase {
     function test_taikoL1_group_4_case_1() external {
         vm.warp(1_000_000);
 
-        giveEthAndDepositBond(Alice, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
 
-        giveEthAndDepositBond(Taylor, 1000 ether);
+        giveEthAndDepositBond(Taylor, 1000 ether, 1000 ether);
         ITierProvider.Tier memory tierOp = TestTierProvider(cp).getTier(LibTiers.TIER_OPTIMISTIC);
         ITierProvider.Tier memory tierSgx = TestTierProvider(cp).getTier(LibTiers.TIER_SGX);
 
@@ -91,10 +91,10 @@ contract TaikoL1TestGroup4 is TaikoL1TestGroupBase {
     function test_taikoL1_group_4_case_2() external {
         vm.warp(1_000_000);
 
-        giveEthAndDepositBond(Alice, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
 
-        giveEthAndDepositBond(David, 1000 ether);
-        giveEthAndDepositBond(Taylor, 1000 ether);
+        giveEthAndDepositBond(David, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(Taylor, 1000 ether, 1000 ether);
         ITierProvider.Tier memory tierOp = TestTierProvider(cp).getTier(LibTiers.TIER_OPTIMISTIC);
         ITierProvider.Tier memory tierSgx = TestTierProvider(cp).getTier(LibTiers.TIER_SGX);
 

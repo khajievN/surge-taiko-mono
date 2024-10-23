@@ -31,7 +31,7 @@ contract TaikoL1TestGroupA1 is TaikoL1TestGroupBase {
         mine(1);
         printBlockAndTrans(0);
 
-        giveEthAndDepositBond(Alice, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
 
         console2.log("====== Alice propose 5 block");
         bytes32 parentHash = GENESIS_BLOCK_HASH;

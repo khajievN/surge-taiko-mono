@@ -13,9 +13,9 @@ contract TaikoL1TestGroup5 is TaikoL1TestGroupBase {
     function test_taikoL1_group_5_case_1() external {
         vm.warp(1_000_000);
 
-        giveEthAndDepositBond(Alice, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
 
-        giveEthAndDepositBond(William, 1000 ether);
+        giveEthAndDepositBond(William, 1000 ether, 1000 ether);
 
         console2.log("====== Alice propose a block");
         TaikoData.BlockMetadata memory meta = proposeBlock(Alice, "");
@@ -132,9 +132,9 @@ contract TaikoL1TestGroup5 is TaikoL1TestGroupBase {
     function test_taikoL1_group_5_case_2() external {
         vm.warp(1_000_000);
 
-        giveEthAndDepositBond(Alice, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
 
-        giveEthAndDepositBond(William, 1000 ether);
+        giveEthAndDepositBond(William, 1000 ether, 1000 ether);
         ITierProvider.Tier memory tierOp = TestTierProvider(cp).getTier(LibTiers.TIER_OPTIMISTIC);
 
         console2.log("====== Alice propose a block");
@@ -219,10 +219,10 @@ contract TaikoL1TestGroup5 is TaikoL1TestGroupBase {
     function test_taikoL1_group_5_case_3() external {
         vm.warp(1_000_000);
 
-        giveEthAndDepositBond(Alice, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
 
-        giveEthAndDepositBond(David, 1000 ether);
-        giveEthAndDepositBond(William, 1000 ether);
+        giveEthAndDepositBond(David, 1000 ether, 1000 ether);
+        giveEthAndDepositBond(William, 1000 ether, 1000 ether);
         ITierProvider.Tier memory tierOp = TestTierProvider(cp).getTier(LibTiers.TIER_OPTIMISTIC);
 
         console2.log("====== Alice propose a block");
@@ -312,9 +312,9 @@ contract TaikoL1TestGroup5 is TaikoL1TestGroupBase {
     function test_taikoL1_group_5_case_4() external {
         vm.warp(1_000_000);
 
-        giveEthAndDepositBond(Alice, 1000 ether);
+        giveEthAndDepositBond(Alice, 1000 ether, 1000 ether);
 
-        giveEthAndDepositBond(William, 1000 ether);
+        giveEthAndDepositBond(William, 1000 ether, 1000 ether);
 
         console2.log("====== Alice propose a block");
         TaikoData.BlockMetadata memory meta = proposeBlock(Alice, "");
