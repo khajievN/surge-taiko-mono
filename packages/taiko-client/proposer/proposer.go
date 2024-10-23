@@ -546,11 +546,10 @@ func (p *Proposer) isProfitable(txList types.Transactions) (bool, error) {
 	for _, tx := range txList {
 		gasConsumed := tx.Gas()
 		priorityGasPrice, err := p.getPriorityGasPrice(tx)
-
 		if err != nil {
 			return false, err
 		}
-		// priorityGasPrice * gasConsumed
+
 		transactionFees := new(big.Int).Mul(new(big.Int).SetUint64(gasConsumed), priorityGasPrice)
 		totalGasConsumed += gasConsumed
 
@@ -573,42 +572,30 @@ func (p *Proposer) getPriorityGasPrice(tx *types.Transaction) (*big.Int, error) 
 	return new(big.Int).Sub(tx.GasPrice(), baseFee), nil
 }
 
-func adjustForPriceFluctuation(gasPrice *big.Int, percentage int64) *big.Int {
-
-	temp := new(big.Int).Mul(gasPrice, big.NewInt(100+percentage))
+func adjustForPriceFluctuation(gasPrice *big.Int, percentage uint64) *big.Int {
+	temp := new(big.Int).Mul(gasPrice, new(big.Int).SetUint64(uint64(100)+percentage))
 	return new(big.Int).Div(temp, big.NewInt(100))
 }
 
-// Sum of all transactions in block > Total costs
 // Total Costs =
 // (gas needed for block proposal + gas needed for proof verification ) *
-//
 // (gas price on L1 + 50% for price fluctuation) +
 //
 //	off chain proving costs (estimated with a margin for the provers' revenue)
 func (p *Proposer) estimateTotalCosts(gasUsed uint64) (*big.Int, error) {
-	// TODO: how to get this value?
-	gasNeededForProposal := big.NewInt(0)
-	// TODO: how to get this value?
-	gasNeededForProofVerification := big.NewInt(0)
-
 	totalL1GasNeeded := new(big.Int).Add(
-		gasNeededForProposal,
-		gasNeededForProofVerification,
+		new(big.Int).SetUint64(p.GasNeededForProposingBlock),
+		new(big.Int).SetUint64(p.GasNeededForProvingBlock),
 	)
 
 	l1GasPrice, err := p.rpc.L1.SuggestGasPrice(p.ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	adjustedL1GasPrice := adjustForPriceFluctuation(l1GasPrice, 50)
+	adjustedL1GasPrice := adjustForPriceFluctuation(l1GasPrice, p.PriceFluctuationModifier)
 	l1Costs := new(big.Int).Mul(totalL1GasNeeded, adjustedL1GasPrice)
 
-	// TODO: how to get these?
-	offChainCosts := big.NewInt(0)
-
-	totalCosts := new(big.Int).Add(l1Costs, offChainCosts)
+	totalCosts := new(big.Int).Add(l1Costs, p.OffChainCosts)
 
 	return totalCosts, nil
 }
