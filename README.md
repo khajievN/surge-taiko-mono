@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">
-  Taiko Core Rollup
+  Surge Rollup
 </h1>
 
 <p align="center">
