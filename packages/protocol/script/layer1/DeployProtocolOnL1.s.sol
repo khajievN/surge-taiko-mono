@@ -275,13 +275,7 @@ contract DeployProtocolOnL1 is DeployCapability {
             )
         });
 
-        TaikoL1 taikoL1;
-        if (keccak256(abi.encode(vm.envString("TIER_PROVIDER"))) == keccak256(abi.encode("devnet")))
-        {
-            taikoL1 = TaikoL1(address(new DevnetTaikoL1()));
-        } else {
-            taikoL1 = TaikoL1(address(new TaikoL1()));
-        }
+        TaikoL1 taikoL1 = TaikoL1(address(new TaikoL1()));
 
         deployProxy({
             name: "taiko",
