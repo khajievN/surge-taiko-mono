@@ -19,7 +19,7 @@ var (
 		LivenessBond:          livenessBond,
 		StateRootSyncInternal: 16,
 		MaxAnchorHeightOffset: 64,
-		OntakeForkHeight:      2,
+		OntakeForkHeight:      1,
 		BaseFeeConfig: bindings.LibSharedDataBaseFeeConfig{
 			AdjustmentQuotient:     8,
 			SharingPctg:            75,
@@ -37,7 +37,7 @@ var (
 		LivenessBond:          livenessBond,
 		StateRootSyncInternal: 16,
 		MaxAnchorHeightOffset: 64,
-		OntakeForkHeight:      840_512,
+		OntakeForkHeight:      1,
 		BaseFeeConfig: bindings.LibSharedDataBaseFeeConfig{
 			AdjustmentQuotient:     8,
 			SharingPctg:            75,
@@ -55,7 +55,7 @@ var (
 		LivenessBond:          livenessBond,
 		StateRootSyncInternal: 16,
 		MaxAnchorHeightOffset: 64,
-		OntakeForkHeight:      538_304,
+		OntakeForkHeight:      1,
 		BaseFeeConfig: bindings.LibSharedDataBaseFeeConfig{
 			AdjustmentQuotient:     8,
 			GasIssuancePerSecond:   5_000_000,
