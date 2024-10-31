@@ -19,6 +19,7 @@ type TransactionBuilderTestSuite struct {
 	testutils.ClientTestSuite
 	calldataTxBuilder *CalldataTransactionBuilder
 	blobTxBuiler      *BlobTransactionBuilder
+	chainConfig       *config.ChainConfig
 }
 
 func (s *TransactionBuilderTestSuite) SetupTest() {
@@ -50,6 +51,7 @@ func (s *TransactionBuilderTestSuite) SetupTest() {
 		"test",
 		chainConfig,
 	)
+	s.chainConfig = chainConfig
 }
 
 func (s *TransactionBuilderTestSuite) TestGetParentMetaHash() {
