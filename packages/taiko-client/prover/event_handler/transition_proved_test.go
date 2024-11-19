@@ -119,7 +119,6 @@ func (s *EventHandlerTestSuite) SetupTest() {
 			TxSendTimeout:             txmgr.DefaultBatcherFlagValues.TxSendTimeout,
 			TxNotInMempoolTimeout:     txmgr.DefaultBatcherFlagValues.TxNotInMempoolTimeout,
 		},
-		GasNeededForProposingBlock: 0,
 		GasNeededForProvingBlock:   0,
 		PriceFluctuationModifier:   50,
 		OffChainCosts:              big.NewInt(0),

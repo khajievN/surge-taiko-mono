@@ -113,14 +113,6 @@ var (
 		EnvVars: []string{"L1_BLOB_ALLOWED"},
 	}
 	// Surge related.
-	GasNeededForProposingBlock = &cli.Uint64Flag{
-		Name:     "surge.gasNeededForProposingBlock",
-		Usage:    "Gas needed for proposing a block",
-		Value:    0,
-		Category: proposerCategory,
-		EnvVars:  []string{"SURGE_GAS_NEEDED_FOR_PROPOSING_BLOCK"},
-	}
-
 	GasNeededForProvingBlock = &cli.Uint64Flag{
 		Name:     "surge.gasNeededForProvingBlock",
 		Usage:    "Gas needed for proving a block",
@@ -167,7 +159,6 @@ var ProposerFlags = MergeFlags(CommonFlags, []cli.Flag{
 	ProposeBlockIncludeParentMetaHash,
 	BlobAllowed,
 	// surge flags
-	GasNeededForProposingBlock,
 	GasNeededForProvingBlock,
 	PriceFluctuationModifier,
 	OffChainCosts,

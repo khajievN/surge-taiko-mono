@@ -65,7 +65,6 @@ func (s *ProposerTestSuite) TestNewConfigFromCliContext() {
 		"--" + flags.TxGasLimit.Name, "100000",
 		"--" + flags.OffChainCosts.Name, offChainCosts,
 		"--" + flags.ProposeBlockIncludeParentMetaHash.Name, "true",
-		"--" + flags.GasNeededForProposingBlock.Name, "100000",
 		"--" + flags.GasNeededForProvingBlock.Name, "100000",
 		"--" + flags.PriceFluctuationModifier.Name, "100",
 	}))
@@ -123,7 +122,6 @@ func (s *ProposerTestSuite) SetupApp() *cli.App {
 		&cli.StringFlag{Name: flags.TxPoolLocals.Name},
 		&cli.DurationFlag{Name: flags.RPCTimeout.Name},
 		&cli.BoolFlag{Name: flags.ProposeBlockIncludeParentMetaHash.Name},
-		&cli.Uint64Flag{Name: flags.GasNeededForProposingBlock.Name},
 		&cli.Uint64Flag{Name: flags.GasNeededForProvingBlock.Name},
 		&cli.Uint64Flag{Name: flags.PriceFluctuationModifier.Name},
 		&cli.StringFlag{Name: flags.OffChainCosts.Name},
