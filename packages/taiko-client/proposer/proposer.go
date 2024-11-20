@@ -514,14 +514,25 @@ func (p *Proposer) buildCheaperOnTakeTransaction(ctx context.Context,
 		return nil, nil, err
 	}
 
-	txBlob, err := p.txBlobBuilder.BuildOntake(ctx, txListsBytesArray)
-	if err != nil {
-		return nil, nil, err
-	}
+	var tx *txmgr.TxCandidate
+	var cost *big.Int
 
-	tx, cost, err := p.chooseCheaperTransaction(txCallData, txBlob)
-	if err != nil {
-		return nil, nil, err
+	if p.txBlobBuilder != nil {
+		txBlob, err := p.txBlobBuilder.BuildOntake(ctx, txListsBytesArray)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		tx, cost, err = p.chooseCheaperTransaction(txCallData, txBlob)
+		if err != nil {
+			return nil, nil, err
+		}
+	} else {
+		cost, err = p.getTransactionCost(txCallData)
+		if err != nil {
+			return nil, nil, err
+		}
+		tx = txCallData
 	}
 
 	return tx, cost, nil
@@ -677,8 +688,10 @@ func (p *Proposer) getTransactionCost(txCandidate *txmgr.TxCandidate) (*big.Int,
 	}
 
 	estimatedGasUsage, err := p.rpc.L1.EstimateGas(p.ctx, ethereum.CallMsg{
-		To:   txCandidate.To,
-		Data: txCandidate.TxData,
+		From:          p.proposerAddress,
+		To:            txCandidate.To,
+		Data:          txCandidate.TxData,
+		Gas:           0,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to estimate gas: %w", err)
