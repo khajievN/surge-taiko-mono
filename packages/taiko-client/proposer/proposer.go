@@ -486,14 +486,21 @@ func (p *Proposer) ProposeTxListOntake(
 		return errors.New("insufficient prover balance")
 	}
 
-	// txCandidate, err := p.txCallDataBuilder.BuildOntake(ctx, txListsBytesArray)
-	txCandidate, _, err := p.buildCheaperOnTakeTransaction(ctx, txListsBytesArray)
+	txCandidate, cost, err := p.buildCheaperOnTakeTransaction(ctx, txListsBytesArray)
 	if err != nil {
 		log.Warn("Failed to build TaikoL1.proposeBlocksV2 transaction", "error", encoding.TryParsingCustomError(err))
 		return err
 	}
 
 	// check profitability
+	profitable, err := p.isProfitable(txLists, cost)
+	if err != nil {
+		return err
+	}
+	if !profitable {
+		log.Info("Proposing transaction is not profitable", "cost", cost)
+		return nil
+	}
 
 	if err := p.sendTx(ctx, txCandidate); err != nil {
 		return err
@@ -639,8 +646,8 @@ func (p *Proposer) Name() string {
 
 // Profitability is determined by comparing the revenue from transaction fees
 // to the costs of proposing and proving the block. Specifically:
-func (p *Proposer) isProfitable(txList types.Transactions, proposingCosts *big.Int) (bool, error) {
-	totalTransactionFees, err := p.calculateTotalL2TransactionsFees(txList)
+func (p *Proposer) isProfitable(txLists []types.Transactions, proposingCosts *big.Int) (bool, error) {
+	totalTransactionFees, err := p.calculateTotalL2TransactionsFees(txLists)
 	if err != nil {
 		return false, err
 	}
@@ -655,7 +662,7 @@ func (p *Proposer) isProfitable(txList types.Transactions, proposingCosts *big.I
 	return totalTransactionFees.Cmp(costs) > 0, nil
 }
 
-func (p *Proposer) calculateTotalL2TransactionsFees(txList types.Transactions) (*big.Int, error) {
+func (p *Proposer) calculateTotalL2TransactionsFees(txLists []types.Transactions) (*big.Int, error) {
 	totalTransactionFees := new(big.Int)
 	totalGasConsumed := new(big.Int)
 
@@ -668,8 +675,10 @@ func (p *Proposer) calculateTotalL2TransactionsFees(txList types.Transactions) (
 		return nil, err
 	}
 
-	for _, tx := range txList {
-		totalGasConsumed.Add(totalGasConsumed, new(big.Int).SetUint64(tx.Gas()))
+	for _, txs := range txLists {
+		for _, tx := range txs {
+			totalGasConsumed.Add(totalGasConsumed, new(big.Int).SetUint64(tx.Gas()))
+		}
 	}
 
 	threeFourthBaseFee := new(big.Int).Div(baseL2Fee, big.NewInt(4))
@@ -688,10 +697,10 @@ func (p *Proposer) getTransactionCost(txCandidate *txmgr.TxCandidate) (*big.Int,
 	}
 
 	estimatedGasUsage, err := p.rpc.L1.EstimateGas(p.ctx, ethereum.CallMsg{
-		From:          p.proposerAddress,
-		To:            txCandidate.To,
-		Data:          txCandidate.TxData,
-		Gas:           0,
+		From: p.proposerAddress,
+		To:   txCandidate.To,
+		Data: txCandidate.TxData,
+		Gas:  0,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to estimate gas: %w", err)
