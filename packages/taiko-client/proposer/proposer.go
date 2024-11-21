@@ -316,26 +316,8 @@ func (p *Proposer) ProposeOp(ctx context.Context) error {
 		return err
 	}
 
-	// // check calldata blob profitability
-	// calldataProposingCosts, err := p.getCalldataProposingCosts(txLists, isOntake)
-	// if err != nil {
-	// 	return err
-	// }
-	// blobProposingCosts, err := p.getBlobProposingCosts(txLists)
-	// if err != nil {
-	// 	return err
-	// }
-	// if calldataProposingCosts.Cmp(blobProposingCosts) > 0 {
-	// 	// chose blob tx builder
-	// } else {
-	// 	// chose calldata tx builder
-	// }
-
-	// TODO return compressed txLists so they can be used directly in proposing
-	// txLists = p.filterProfitableTxLists(txLists)
-	// If there are no profitable transactions, return without proposing
 	if len(txLists) == 0 {
-		log.Info("No profitable transactions to propose")
+		log.Info("No transactions to propose")
 		return nil
 	}
 
@@ -431,14 +413,23 @@ func (p *Proposer) ProposeTxListLegacy(
 		return errors.New("insufficient prover balance")
 	}
 
-	txCandidate, err := p.txCallDataBuilder.BuildLegacy(
+	txCandidate, cost, err := p.buildCheaperLegacyTransaction(
 		ctx,
-		p.IncludeParentMetaHash,
 		compressedTxListBytes,
 	)
 	if err != nil {
 		log.Warn("Failed to build TaikoL1.proposeBlock transaction", "error", encoding.TryParsingCustomError(err))
 		return err
+	}
+
+	// check profitability
+	profitable, err := p.isProfitable([]types.Transactions{txList}, cost)
+	if err != nil {
+		return err
+	}
+	if !profitable {
+		log.Info("Proposing legacy transaction is not profitable", "cost", cost)
+		return nil
 	}
 
 	if err := p.sendTx(ctx, txCandidate); err != nil {
@@ -451,6 +442,37 @@ func (p *Proposer) ProposeTxListLegacy(
 	metrics.ProposerProposedTxsCounter.Add(float64(len(txList)))
 
 	return nil
+}
+
+func (p *Proposer) buildCheaperLegacyTransaction(ctx context.Context,
+	txList []byte) (*txmgr.TxCandidate, *big.Int, error) {
+	txCallData, err := p.txCallDataBuilder.BuildLegacy(ctx, p.IncludeParentMetaHash, txList)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var tx *txmgr.TxCandidate
+	var cost *big.Int
+
+	if p.txBlobBuilder != nil {
+		txBlob, err := p.txBlobBuilder.BuildLegacy(ctx, p.IncludeParentMetaHash, txList)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		tx, cost, err = p.chooseCheaperTransaction(txCallData, txBlob)
+		if err != nil {
+			return nil, nil, err
+		}
+	} else {
+		cost, err = p.getTransactionCost(txCallData)
+		if err != nil {
+			return nil, nil, err
+		}
+		tx = txCallData
+	}
+
+	return tx, cost, nil
 }
 
 // ProposeTxListOntake proposes the given transactions lists to TaikoL1 smart contract.
@@ -498,7 +520,7 @@ func (p *Proposer) ProposeTxListOntake(
 		return err
 	}
 	if !profitable {
-		log.Info("Proposing transaction is not profitable", "cost", cost)
+		log.Info("Proposing Ontake transaction is not profitable", "cost", cost)
 		return nil
 	}
 
@@ -693,7 +715,7 @@ func (p *Proposer) getTransactionCost(txCandidate *txmgr.TxCandidate) (*big.Int,
 	// Get the current L1 gas price
 	gasPrice, err := p.rpc.L1.SuggestGasPrice(p.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get gas price: %w", err)
+		return nil, fmt.Errorf("getTransactionCost: failed to get gas price: %w", err)
 	}
 
 	estimatedGasUsage, err := p.rpc.L1.EstimateGas(p.ctx, ethereum.CallMsg{
@@ -703,7 +725,7 @@ func (p *Proposer) getTransactionCost(txCandidate *txmgr.TxCandidate) (*big.Int,
 		Gas:  0,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to estimate gas: %w", err)
+		return nil, fmt.Errorf("getTransactionCost: failed to estimate gas: %w", err)
 	}
 
 	return new(big.Int).Mul(gasPrice, new(big.Int).SetUint64(estimatedGasUsage)), nil
