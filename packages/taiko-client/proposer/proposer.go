@@ -548,7 +548,10 @@ func (p *Proposer) buildCheaperOnTakeTransaction(ctx context.Context,
 	return tx, cost, nil
 }
 
-func (p *Proposer) chooseCheaperTransaction(txCallData *txmgr.TxCandidate, txBlob *txmgr.TxCandidate) (*txmgr.TxCandidate, *big.Int, error) {
+func (p *Proposer) chooseCheaperTransaction(
+	txCallData *txmgr.TxCandidate,
+	txBlob *txmgr.TxCandidate,
+) (*txmgr.TxCandidate, *big.Int, error) {
 	calldataTxCost, err := p.getTransactionCost(txCallData)
 	if err != nil {
 		return nil, nil, err

@@ -42,9 +42,9 @@ type Config struct {
 	TxmgrConfigs               *txmgr.CLIConfig
 	PrivateTxmgrConfigs        *txmgr.CLIConfig
 
-	GasNeededForProvingBlock   uint64
-	PriceFluctuationModifier   uint64
-	OffChainCosts              *big.Int
+	GasNeededForProvingBlock uint64
+	PriceFluctuationModifier uint64
+	OffChainCosts            *big.Int
 }
 
 // NewConfigFromCliContext initializes a Config instance from
@@ -134,8 +134,8 @@ func NewConfigFromCliContext(c *cli.Context) (*Config, error) {
 			l1ProposerPrivKey,
 			c,
 		),
-		GasNeededForProvingBlock:   gasNeededForProvingBlock,
-		PriceFluctuationModifier:   priceFluctuationModifier,
-		OffChainCosts:              offChainCosts,
+		GasNeededForProvingBlock: gasNeededForProvingBlock,
+		PriceFluctuationModifier: priceFluctuationModifier,
+		OffChainCosts:            offChainCosts,
 	}, nil
 }

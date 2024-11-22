@@ -424,14 +424,14 @@ func (c *EthClient) FillTransaction(ctx context.Context, args *TransactionArgs) 
 
 // BlobBaseFee retrieves the current blob base fee using eth_blobBaseFee RPC method
 func (c *EthClient) BlobBaseFee(ctx context.Context) (*big.Int, error) {
-    ctxWithTimeout, cancel := CtxWithTimeoutOrDefault(ctx, c.timeout)
-    defer cancel()
+	ctxWithTimeout, cancel := CtxWithTimeoutOrDefault(ctx, c.timeout)
+	defer cancel()
 
-    var result hexutil.Big
-    err := c.CallContext(ctxWithTimeout, &result, "eth_blobBaseFee")
-    if err != nil {
-        return nil, err
-    }
+	var result hexutil.Big
+	err := c.CallContext(ctxWithTimeout, &result, "eth_blobBaseFee")
+	if err != nil {
+		return nil, err
+	}
 
-    return (*big.Int)(&result), nil
+	return (*big.Int)(&result), nil
 }
