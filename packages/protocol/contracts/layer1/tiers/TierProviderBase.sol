@@ -95,7 +95,7 @@ abstract contract TierProviderBase is ITierProvider {
             verifierName: _verifierName,
             validityBond: _validityBond,
             contestBond: _validityBond / 10_000 * 65_625,
-            cooldownWindow: _cooldownWindow,
+            cooldownWindow: 0,
             provingWindow: GRACE_PERIOD + _provingWindow,
             maxBlocksToVerifyPerProof: 0
         });
