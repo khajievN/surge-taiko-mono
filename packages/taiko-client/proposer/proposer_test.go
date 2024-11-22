@@ -310,7 +310,7 @@ func (s *ProposerTestSuite) TestProposeTxListOntake() {
 		sub.Unsubscribe()
 		close(sink)
 	}()
-	s.Nil(s.p.ProposeTxListOntake(context.Background(), []types.Transactions{{}, {}}))
+	s.Nil(s.p.ProposeTxListOntake(context.Background(), []types.Transactions{{}, {}}, false))
 	s.Nil(s.s.ProcessL1Blocks(context.Background()))
 
 	var l1Height *big.Int

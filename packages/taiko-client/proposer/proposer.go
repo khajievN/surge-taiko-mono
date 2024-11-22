@@ -303,11 +303,11 @@ func (p *Proposer) ProposeOp(ctx context.Context) error {
 	}
 
 	// Propose the profitable transactions lists
-	return p.ProposeTxLists(ctx, txLists)
+	return p.ProposeTxLists(ctx, txLists, true)
 }
 
 // ProposeTxLists proposes the given transactions lists to TaikoL1 smart contract.
-func (p *Proposer) ProposeTxLists(ctx context.Context, txLists []types.Transactions) error {
+func (p *Proposer) ProposeTxLists(ctx context.Context, txLists []types.Transactions, checkProfitability bool) error {
 	// Check if the current L2 chain is after ontake fork.
 	state, err := rpc.GetProtocolStateVariables(p.rpc.TaikoL1, &bind.CallOpts{Context: ctx})
 	if err != nil {
@@ -328,7 +328,7 @@ func (p *Proposer) ProposeTxLists(ctx context.Context, txLists []types.Transacti
 			log.Info("Proposer current pending nonce", "nonce", nonce)
 
 			g.Go(func() error {
-				if err := p.ProposeTxListLegacy(gCtx, txs); err != nil {
+				if err := p.ProposeTxListLegacy(gCtx, txs, checkProfitability); err != nil {
 					return err
 				}
 				p.lastProposedAt = time.Now()
@@ -344,7 +344,7 @@ func (p *Proposer) ProposeTxLists(ctx context.Context, txLists []types.Transacti
 	}
 
 	// If the current L2 chain is after ontake fork, batch propose all L2 transactions lists.
-	if err := p.ProposeTxListOntake(ctx, txLists); err != nil {
+	if err := p.ProposeTxListOntake(ctx, txLists, checkProfitability); err != nil {
 		return err
 	}
 	p.lastProposedAt = time.Now()
@@ -361,6 +361,7 @@ func (p *Proposer) getTxListsToPropose(txLists []types.Transactions) []types.Tra
 func (p *Proposer) ProposeTxListLegacy(
 	ctx context.Context,
 	txList types.Transactions,
+	checkProfitability bool,
 ) error {
 	txListBytes, err := rlp.EncodeToBytes(txList)
 	if err != nil {
@@ -404,13 +405,15 @@ func (p *Proposer) ProposeTxListLegacy(
 	}
 
 	// check profitability
-	profitable, err := p.isProfitable([]types.Transactions{txList}, cost)
-	if err != nil {
-		return err
-	}
-	if !profitable {
-		log.Info("Proposing legacy transaction is not profitable")
-		return nil
+	if checkProfitability {
+		profitable, err := p.isProfitable([]types.Transactions{txList}, cost)
+		if err != nil {
+			return err
+		}
+		if !profitable {
+			log.Info("Proposing legacy transaction is not profitable")
+			return nil
+		}
 	}
 
 	if err := p.sendTx(ctx, txCandidate); err != nil {
@@ -460,6 +463,7 @@ func (p *Proposer) buildCheaperLegacyTransaction(ctx context.Context,
 func (p *Proposer) ProposeTxListOntake(
 	ctx context.Context,
 	txLists []types.Transactions,
+	checkProfitability bool,
 ) error {
 	txListsBytesArray, totalTxs, err := p.compressTxLists(txLists)
 	if err != nil {
@@ -496,13 +500,15 @@ func (p *Proposer) ProposeTxListOntake(
 	}
 
 	// check profitability
-	profitable, err := p.isProfitable(txLists, cost)
-	if err != nil {
-		return err
-	}
-	if !profitable {
-		log.Info("Proposing Ontake transaction is not profitable")
-		return nil
+	if checkProfitability {
+		profitable, err := p.isProfitable(txLists, cost)
+		if err != nil {
+			return err
+		}
+		if !profitable {
+			log.Info("Proposing Ontake transaction is not profitable")
+			return nil
+		}
 	}
 
 	if err := p.sendTx(ctx, txCandidate); err != nil {

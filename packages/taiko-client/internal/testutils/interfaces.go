@@ -15,5 +15,5 @@ type BlobSyncer interface {
 type Proposer interface {
 	utils.SubcommandApplication
 	ProposeOp(ctx context.Context) error
-	ProposeTxLists(ctx context.Context, txLists []types.Transactions) error
+	ProposeTxLists(ctx context.Context, txLists []types.Transactions, checkProfitability bool) error
 }
