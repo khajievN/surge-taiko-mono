@@ -340,6 +340,7 @@ func (s *DriverTestSuite) InitProposer() {
 			TxSendTimeout:             txmgr.DefaultBatcherFlagValues.TxSendTimeout,
 			TxNotInMempoolTimeout:     txmgr.DefaultBatcherFlagValues.TxNotInMempoolTimeout,
 		},
+		CheckProfitability:       true,
 		GasNeededForProvingBlock: 0,
 		PriceFluctuationModifier: 50,
 		OffChainCosts:            big.NewInt(0),

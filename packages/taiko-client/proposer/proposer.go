@@ -459,7 +459,6 @@ func (p *Proposer) ProposeTxListOntake(
 		return err
 	}
 
-	// check profitability
 	if checkProfitability {
 		profitable, err := p.isProfitable(txLists, cost)
 		if err != nil {
