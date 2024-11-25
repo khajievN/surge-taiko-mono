@@ -46,6 +46,7 @@ type Proposer struct {
 	// Transaction builder
 	txCallDataBuilder builder.ProposeBlockTransactionBuilder
 	txBlobBuilder     builder.ProposeBlockTransactionBuilder
+	defaultTxBuilder  builder.ProposeBlockTransactionBuilder
 
 	// Protocol configurations
 	protocolConfigs *bindings.TaikoDataConfig
@@ -140,8 +141,10 @@ func (p *Proposer) InitFromConfig(
 			cfg.ExtraData,
 			chainConfig,
 		)
+		p.defaultTxBuilder = p.txBlobBuilder
 	} else {
 		p.txBlobBuilder = nil
+		p.defaultTxBuilder = p.txCallDataBuilder
 	}
 
 	return nil
@@ -319,7 +322,7 @@ func (p *Proposer) ProposeTxLists(ctx context.Context, txLists []types.Transacti
 			log.Info("Proposer current pending nonce", "nonce", nonce)
 
 			g.Go(func() error {
-				if err := p.ProposeTxListLegacy(gCtx, txs, checkProfitability); err != nil {
+				if err := p.ProposeTxListLegacy(gCtx, txs); err != nil {
 					return err
 				}
 				p.lastProposedAt = time.Now()
@@ -352,7 +355,6 @@ func (p *Proposer) getTxListsToPropose(txLists []types.Transactions) []types.Tra
 func (p *Proposer) ProposeTxListLegacy(
 	ctx context.Context,
 	txList types.Transactions,
-	checkProfitability bool,
 ) error {
 	txListBytes, err := rlp.EncodeToBytes(txList)
 	if err != nil {
@@ -386,25 +388,14 @@ func (p *Proposer) ProposeTxListLegacy(
 		return errors.New("insufficient prover balance")
 	}
 
-	txCandidate, cost, err := p.buildCheaperLegacyTransaction(
+	txCandidate, err := p.defaultTxBuilder.BuildLegacy(
 		ctx,
+		p.IncludeParentMetaHash,
 		compressedTxListBytes,
 	)
 	if err != nil {
 		log.Warn("Failed to build TaikoL1.proposeBlock transaction", "error", encoding.TryParsingCustomError(err))
 		return err
-	}
-
-	// check profitability
-	if checkProfitability {
-		profitable, err := p.isProfitable([]types.Transactions{txList}, cost)
-		if err != nil {
-			return err
-		}
-		if !profitable {
-			log.Info("Proposing legacy transaction is not profitable")
-			return nil
-		}
 	}
 
 	if err := p.sendTx(ctx, txCandidate); err != nil {
@@ -417,37 +408,6 @@ func (p *Proposer) ProposeTxListLegacy(
 	metrics.ProposerProposedTxsCounter.Add(float64(len(txList)))
 
 	return nil
-}
-
-func (p *Proposer) buildCheaperLegacyTransaction(ctx context.Context,
-	txList []byte) (*txmgr.TxCandidate, *big.Int, error) {
-	txCallData, err := p.txCallDataBuilder.BuildLegacy(ctx, p.IncludeParentMetaHash, txList)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var tx *txmgr.TxCandidate
-	var cost *big.Int
-
-	if p.txBlobBuilder != nil {
-		txBlob, err := p.txBlobBuilder.BuildLegacy(ctx, p.IncludeParentMetaHash, txList)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		tx, cost, err = p.chooseCheaperTransaction(txCallData, txBlob)
-		if err != nil {
-			return nil, nil, err
-		}
-	} else {
-		cost, err = p.getTransactionCost(txCallData)
-		if err != nil {
-			return nil, nil, err
-		}
-		tx = txCallData
-	}
-
-	return tx, cost, nil
 }
 
 // ProposeTxListOntake proposes the given transactions lists to TaikoL1 smart contract.
