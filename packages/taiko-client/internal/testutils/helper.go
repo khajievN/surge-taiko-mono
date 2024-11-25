@@ -23,7 +23,7 @@ import (
 )
 
 func (s *ClientTestSuite) proposeEmptyBlockOp(ctx context.Context, proposer Proposer) {
-	s.Nil(proposer.ProposeTxLists(ctx, []types.Transactions{{}}, false))
+	s.Nil(proposer.ProposeTxLists(ctx, []types.Transactions{{}}))
 }
 
 func (s *ClientTestSuite) ProposeAndInsertEmptyBlocks(
@@ -52,7 +52,7 @@ func (s *ClientTestSuite) ProposeAndInsertEmptyBlocks(
 	}()
 
 	// RLP encoded empty list
-	s.Nil(proposer.ProposeTxLists(context.Background(), []types.Transactions{{}}, false))
+	s.Nil(proposer.ProposeTxLists(context.Background(), []types.Transactions{{}}))
 	s.Nil(blobSyncer.ProcessL1Blocks(context.Background()))
 
 	// Valid transactions lists.
