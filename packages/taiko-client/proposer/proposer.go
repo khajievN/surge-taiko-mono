@@ -190,7 +190,7 @@ func (p *Proposer) Close(_ context.Context) {
 }
 
 // fetchPoolContent fetches the transaction pool content from L2 execution engine.
-func (p *Proposer) fetchPoolContent(filterPoolContent bool) ([]types.Transactions, error) {
+func (p *Proposer) fetchPoolContent(filterPoolContent bool, checkProfitability bool) ([]types.Transactions, error) {
 	var (
 		minTip  = p.MinTip
 		startAt = time.Now()
@@ -233,6 +233,15 @@ func (p *Proposer) fetchPoolContent(filterPoolContent bool) ([]types.Transaction
 			break
 		}
 		txLists = append(txLists, txs.TxList)
+	}
+	// If the pool is empty and we're not filtering or checking profitability, propose an empty block
+	if !filterPoolContent && !checkProfitability && len(txLists) == 0 {
+		log.Info(
+			"Pool content is empty, proposing an empty block",
+			"lastProposedAt", p.lastProposedAt,
+			"minProposingInternal", p.MinProposingInternal,
+		)
+		txLists = append(txLists, types.Transactions{})
 	}
 
 	// If LocalAddressesOnly is set, filter the transactions by the local addresses.
@@ -286,7 +295,7 @@ func (p *Proposer) ProposeOp(ctx context.Context) error {
 		"lastProposedAt", p.lastProposedAt,
 	)
 
-	txLists, err := p.fetchPoolContent(filterPoolContent)
+	txLists, err := p.fetchPoolContent(filterPoolContent, true)
 	if err != nil {
 		return err
 	}
