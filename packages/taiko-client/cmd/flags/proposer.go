@@ -164,7 +164,7 @@ var ProposerFlags = MergeFlags(CommonFlags, []cli.Flag{
 	MaxProposedTxListsPerEpoch,
 	ProposeBlockIncludeParentMetaHash,
 	BlobAllowed,
-	// surge flags
+	CheckProfitability,
 	GasNeededForProvingBlock,
 	PriceFluctuationModifier,
 	OffChainCosts,
