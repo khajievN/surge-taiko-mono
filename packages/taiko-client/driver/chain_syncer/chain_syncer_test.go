@@ -3,7 +3,6 @@ package chainsyncer
 import (
 	"bytes"
 	"context"
-	"math/big"
 
 	"os"
 	"testing"
