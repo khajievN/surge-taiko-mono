@@ -319,10 +319,9 @@ func (p *Proposer) ProposeTxLists(ctx context.Context, txLists []types.Transacti
 	if err != nil {
 		return err
 	}
-	isOntake := p.chainConfig.IsOntake(new(big.Int).SetUint64(state.B.NumBlocks))
 
 	// If the current L2 chain is before ontake fork, propose the transactions lists one by one.
-	if !isOntake {
+	if !p.chainConfig.IsOntake(new(big.Int).SetUint64(state.B.NumBlocks)) {
 		g, gCtx := errgroup.WithContext(ctx)
 		for _, txs := range p.getTxListsToPropose(txLists) {
 			nonce, err := p.rpc.L1.PendingNonceAt(ctx, p.proposerAddress)
@@ -467,7 +466,7 @@ func (p *Proposer) ProposeTxListOntake(
 			return err
 		}
 		if !profitable {
-			log.Info("Proposing Ontake transaction is not profitable")
+			log.Info("Proposing transaction is not profitable")
 			return nil
 		}
 	}
@@ -541,7 +540,7 @@ func (p *Proposer) chooseCheaperTransaction(
 	return txCallData, calldataTxCost, nil
 }
 
-// compressOnTakeTxLists compresses transaction lists and returns compressed bytes array and transaction counts
+// compressTxLists compresses transaction lists and returns compressed bytes array and transaction counts
 func (p *Proposer) compressTxLists(txLists []types.Transactions) ([][]byte, int, error) {
 	var (
 		txListsBytesArray [][]byte

@@ -124,15 +124,15 @@ var (
 		Usage:    "Gas needed for proving a block",
 		Value:    0,
 		Category: proposerCategory,
-		EnvVars:  []string{"SURGE_GAS_NEEDED_FOR_PROVING_BLOCK"},
+		EnvVars:  []string{"GAS_NEEDED_FOR_PROVING_BLOCK"},
 	}
 
 	PriceFluctuationModifier = &cli.Uint64Flag{
 		Name:     "priceFluctuationModifier",
 		Usage:    "Price fluctuation modifier in percentage",
-		Value:    50,
+		Value:    0,
 		Category: proposerCategory,
-		EnvVars:  []string{"SURGE_PRICE_FLUCTUATION_MODIFIER"},
+		EnvVars:  []string{"PRICE_FLUCTUATION_MODIFIER"},
 	}
 
 	OffChainCosts = &cli.StringFlag{
@@ -140,7 +140,7 @@ var (
 		Usage:    "Off chain costs in WEI",
 		Value:    "0",
 		Category: proposerCategory,
-		EnvVars:  []string{"SURGE_OFF_CHAIN_COSTS"},
+		EnvVars:  []string{"OFF_CHAIN_COSTS"},
 	}
 )
 

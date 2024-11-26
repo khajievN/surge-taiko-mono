@@ -113,10 +113,6 @@ func (s *ProposerTestSuite) SetupTest() {
 			TxSendTimeout:             txmgr.DefaultBatcherFlagValues.TxSendTimeout,
 			TxNotInMempoolTimeout:     txmgr.DefaultBatcherFlagValues.TxNotInMempoolTimeout,
 		},
-		CheckProfitability:       true,
-		GasNeededForProvingBlock: 0,
-		PriceFluctuationModifier: 50,
-		OffChainCosts:            big.NewInt(0),
 	}, nil, nil))
 
 	s.p = p
@@ -240,50 +236,71 @@ func (s *ProposerTestSuite) TestName() {
 }
 
 func (s *ProposerTestSuite) TestProposeOp() {
-	// Propose txs in L2 execution engine's mempool
-	sink := make(chan *bindings.TaikoL1ClientBlockProposed)
-
-	sub, err := s.p.rpc.TaikoL1.WatchBlockProposed(nil, sink, nil, nil)
-	s.Nil(err)
-	defer func() {
-		sub.Unsubscribe()
-		close(sink)
-	}()
-
-	sink2 := make(chan *bindings.TaikoL1ClientBlockProposedV2)
-
-	sub2, err := s.p.rpc.TaikoL1.WatchBlockProposedV2(nil, sink2, nil)
-	s.Nil(err)
-	defer func() {
-		sub2.Unsubscribe()
-		close(sink2)
-	}()
-
-	to := common.BytesToAddress(testutils.RandomBytes(32))
-	_, err = testutils.SendDynamicFeeTx(s.p.rpc.L2, s.TestAddrPrivKey, &to, common.Big1, nil)
-	s.Nil(err)
-
-	s.Nil(s.p.ProposeOp(context.Background()))
-
-	var (
-		meta metadata.TaikoBlockMetaData
-	)
-	select {
-	case event := <-sink:
-		meta = metadata.NewTaikoDataBlockMetadataLegacy(event)
-	case event := <-sink2:
-		meta = metadata.NewTaikoDataBlockMetadataOntake(event)
+	testCases := []struct {
+		name               string
+		checkProfitability bool
+	}{
+		{
+			name:               "Without profitability check",
+			checkProfitability: false,
+		},
+		{
+			name:               "With profitability check",
+			checkProfitability: true,
+		},
 	}
 
-	s.Equal(meta.GetCoinbase(), s.p.L2SuggestedFeeRecipient)
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			// Set profitability check
+			s.p.checkProfitability = tc.checkProfitability
 
-	_, isPending, err := s.p.rpc.L1.TransactionByHash(context.Background(), meta.GetTxHash())
-	s.Nil(err)
-	s.False(isPending)
+			// Propose txs in L2 execution engine's mempool
+			sink := make(chan *bindings.TaikoL1ClientBlockProposed)
 
-	receipt, err := s.p.rpc.L1.TransactionReceipt(context.Background(), meta.GetTxHash())
-	s.Nil(err)
-	s.Equal(types.ReceiptStatusSuccessful, receipt.Status)
+			sub, err := s.p.rpc.TaikoL1.WatchBlockProposed(nil, sink, nil, nil)
+			s.Nil(err)
+			defer func() {
+				sub.Unsubscribe()
+				close(sink)
+			}()
+
+			sink2 := make(chan *bindings.TaikoL1ClientBlockProposedV2)
+
+			sub2, err := s.p.rpc.TaikoL1.WatchBlockProposedV2(nil, sink2, nil)
+			s.Nil(err)
+			defer func() {
+				sub2.Unsubscribe()
+				close(sink2)
+			}()
+
+			to := common.BytesToAddress(testutils.RandomBytes(32))
+			_, err = testutils.SendDynamicFeeTx(s.p.rpc.L2, s.TestAddrPrivKey, &to, common.Big1, nil)
+			s.Nil(err)
+
+			s.Nil(s.p.ProposeOp(context.Background()))
+
+			var (
+				meta metadata.TaikoBlockMetaData
+			)
+			select {
+			case event := <-sink:
+				meta = metadata.NewTaikoDataBlockMetadataLegacy(event)
+			case event := <-sink2:
+				meta = metadata.NewTaikoDataBlockMetadataOntake(event)
+			}
+
+			s.Equal(meta.GetCoinbase(), s.p.L2SuggestedFeeRecipient)
+
+			_, isPending, err := s.p.rpc.L1.TransactionByHash(context.Background(), meta.GetTxHash())
+			s.Nil(err)
+			s.False(isPending)
+
+			receipt, err := s.p.rpc.L1.TransactionReceipt(context.Background(), meta.GetTxHash())
+			s.Nil(err)
+			s.Equal(types.ReceiptStatusSuccessful, receipt.Status)
+		})
+	}
 }
 
 func (s *ProposerTestSuite) TestProposeEmptyBlockOp() {
@@ -308,7 +325,6 @@ func (s *ProposerTestSuite) TestProposeTxListOntake() {
 		sub.Unsubscribe()
 		close(sink)
 	}()
-	s.p.checkProfitability = false
 	s.Nil(s.p.ProposeTxListOntake(context.Background(), []types.Transactions{{}, {}}))
 	s.Nil(s.s.ProcessL1Blocks(context.Background()))
 
