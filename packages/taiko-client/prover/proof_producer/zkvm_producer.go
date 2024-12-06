@@ -52,17 +52,17 @@ type ProofDataV2 struct {
 
 // ZKvmProofProducer generates a ZK proof for the given block.
 type ZKvmProofProducer struct {
-	ZKProofType         	string // ZK Proof type
-	RaikoHostEndpoint   	string
-	RaikoRequestTimeout 	time.Duration
-	JWT                 	string // JWT provided by Raiko
-	Dummy               	bool
-	RaikoSP1Recursion		string
-	RaikoSP1Prover			string
-	RaikoRISC0Bonsai		bool
-	RaikoRISC0Snark			bool
-	RaikoRISC0Profile		bool
-	RaikoRISC0ExecutionPo2	*big.Int
+	ZKProofType            string // ZK Proof type
+	RaikoHostEndpoint      string
+	RaikoRequestTimeout    time.Duration
+	JWT                    string // JWT provided by Raiko
+	Dummy                  bool
+	RaikoSP1Recursion      string
+	RaikoSP1Prover         string
+	RaikoRISC0Bonsai       bool
+	RaikoRISC0Snark        bool
+	RaikoRISC0Profile      bool
+	RaikoRISC0ExecutionPo2 *big.Int
 	DummyProofProducer
 }
 
