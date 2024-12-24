@@ -159,6 +159,7 @@ contract TaikoL1 is EssentialContract, ITaikoL1, TaikoEvents {
 
     /// @inheritdoc ITaikoL1
     function pauseProving(bool _pause) external {
+        _disable();
         _authorizePause(msg.sender, _pause);
         LibProving.pauseProving(state, _pause);
     }
@@ -296,7 +297,7 @@ contract TaikoL1 is EssentialContract, ITaikoL1, TaikoEvents {
             maxBlocksToVerify: 16,
             blockMaxGasLimit: 240_000_000,
             livenessBond: 0.07 ether,
-            stateRootSyncInternal: 16,
+            stateRootSyncInternal: 1,
             maxAnchorHeightOffset: 64,
             baseFeeConfig: LibSharedData.BaseFeeConfig({
                 adjustmentQuotient: 8,
