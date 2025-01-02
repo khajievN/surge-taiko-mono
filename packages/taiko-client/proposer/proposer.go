@@ -64,7 +64,7 @@ type Proposer struct {
 	checkProfitability bool
 
 	allowEmptyBlocks bool
-	initDone bool
+	initDone         bool
 }
 
 // InitFromCli initializes the given proposer instance based on the command line flags.
@@ -461,7 +461,7 @@ func (p *Proposer) ProposeTxListOntake(
 		return errors.New("insufficient prover balance")
 	}
 
-	txCandidate, cost, err := p.buildCheaperOnTakeTransaction(ctx, txListsBytesArray)
+	txCandidate, cost, err := p.buildCheaperOnTakeTransaction(ctx, txListsBytesArray, p.isEmptyBlock(txLists))
 	if err != nil {
 		log.Warn("Failed to build TaikoL1.proposeBlocksV2 transaction", "error", encoding.TryParsingCustomError(err))
 		return err
@@ -491,7 +491,7 @@ func (p *Proposer) ProposeTxListOntake(
 }
 
 func (p *Proposer) buildCheaperOnTakeTransaction(ctx context.Context,
-	txListsBytesArray [][]byte) (*txmgr.TxCandidate, *big.Int, error) {
+	txListsBytesArray [][]byte, isEmptyBlock bool) (*txmgr.TxCandidate, *big.Int, error) {
 	txCallData, err := p.txCallDataBuilder.BuildOntake(ctx, txListsBytesArray)
 	if err != nil {
 		return nil, nil, err
@@ -500,7 +500,7 @@ func (p *Proposer) buildCheaperOnTakeTransaction(ctx context.Context,
 	var tx *txmgr.TxCandidate
 	var cost *big.Int
 
-	if p.txBlobBuilder != nil {
+	if p.txBlobBuilder != nil && !isEmptyBlock {
 		txBlob, err := p.txBlobBuilder.BuildOntake(ctx, txListsBytesArray)
 		if err != nil {
 			return nil, nil, err
@@ -519,6 +519,17 @@ func (p *Proposer) buildCheaperOnTakeTransaction(ctx context.Context,
 	}
 
 	return tx, cost, nil
+}
+
+func (p *Proposer) isEmptyBlock(txLists []types.Transactions) bool {
+	for _, txs := range txLists {
+		for _, tx := range txs {
+			if tx.To() != nil {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func (p *Proposer) chooseCheaperTransaction(
