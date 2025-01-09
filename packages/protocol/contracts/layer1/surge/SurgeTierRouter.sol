@@ -5,6 +5,7 @@ import "./SurgeTierProviderBase.sol";
 import "../tiers/ITierRouter.sol";
 
 /// @title SurgeTierRouter
+/// @custom:security-contact security@nethermind.io
 contract SurgeTierRouter is SurgeTierProviderBase, ITierRouter {
     /// @inheritdoc ITierRouter
     function getProvider(uint256) external view returns (address) {

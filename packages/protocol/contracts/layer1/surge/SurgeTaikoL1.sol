@@ -5,6 +5,7 @@ import "../based/TaikoL1.sol";
 
 /// @title SurgeTaikoL1
 /// @dev Labeled in AddressResolver as "taiko"
+/// @custom:security-contact security@nethermind.io
 contract SurgeTaikoL1 is TaikoL1 {
     uint64 private immutable chainId;
 

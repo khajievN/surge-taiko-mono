@@ -11,6 +11,7 @@ import "../tiers/LibTiers.sol";
 /// - Removed guardian tiers
 /// - Only one proving tier i.e TWO_OF_THREE
 /// - No contestation for the proof
+/// @custom:security-contact security@nethermind.io
 abstract contract SurgeTierProviderBase is ITierProvider {
     uint96 public constant BOND_UNIT = 0.04 ether;
 

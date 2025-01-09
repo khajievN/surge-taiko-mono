@@ -6,6 +6,7 @@ import "./ComposeVerifier.sol";
 
 /// @title TwoOfThreeVerifier
 /// @dev Surge: Allows using any two of the three verifier from SGX / RISC0 / SP1
+/// @custom:security-contact security@nethermind.io
 contract TwoOfThreeVerifier is ComposeVerifier {
     uint256[50] private __gap;
 
