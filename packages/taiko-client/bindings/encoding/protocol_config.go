@@ -15,6 +15,7 @@ const (
 
 var (
 	livenessBond, _             = new(big.Int).SetString("125000000000000000000", 10)
+	surgeLivenessBond, _        = new(big.Int).SetString("70000000000000000000", 10)
 	InternlDevnetProtocolConfig = &bindings.TaikoDataConfig{
 		ChainId:               params.TaikoInternalL2ANetworkID.Uint64(),
 		BlockMaxProposals:     324_000,
@@ -74,7 +75,7 @@ var (
 		BlockRingBufferSize:   360_000,
 		MaxBlocksToVerify:     16,
 		BlockMaxGasLimit:      240_000_000,
-		LivenessBond:          livenessBond,
+		LivenessBond:          surgeLivenessBond,
 		StateRootSyncInternal: 1,
 		MaxAnchorHeightOffset: 64,
 		OntakeForkHeight:      1,
@@ -91,7 +92,7 @@ var (
 		BlockRingBufferSize:   360_000,
 		MaxBlocksToVerify:     16,
 		BlockMaxGasLimit:      240_000_000,
-		LivenessBond:          livenessBond,
+		LivenessBond:          surgeLivenessBond,
 		StateRootSyncInternal: 1,
 		MaxAnchorHeightOffset: 64,
 		OntakeForkHeight:      1,
