@@ -19,17 +19,17 @@ contract SurgeTaikoL1 is TaikoL1 {
             chainId: chainId,
             blockMaxProposals: 324_000,
             blockRingBufferSize: 360_000,
-            maxBlocksToVerify: 16,
-            blockMaxGasLimit: 240_000_000,
+            maxBlocksToVerify: 4,
+            blockMaxGasLimit: 600_000_000,
             livenessBond: 0.07 ether,
-            stateRootSyncInternal: 16,
+            stateRootSyncInternal: 4,
             maxAnchorHeightOffset: 64,
             baseFeeConfig: LibSharedData.BaseFeeConfig({
                 adjustmentQuotient: 8,
                 sharingPctg: 75,
-                gasIssuancePerSecond: 5_000_000,
-                minGasExcess: 1_340_000_000,
-                maxGasIssuancePerBlock: 600_000_000
+                gasIssuancePerSecond: 100_000_000,
+                minGasExcess: 31_136_000_000, // Resolves to ~0.09992 Gwei
+                maxGasIssuancePerBlock: 6_000_000_000
             }),
             ontakeForkHeight: 1
         });
