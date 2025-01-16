@@ -12,7 +12,7 @@
 
 ## Documentation
 
-Get started with Taiko:
+Get started with Surge:
 
 - [Surge docs](https://docs.surge.wtf) — High-level concepts, guides, resources, and reference pages for getting started.
 - [Protocol specs](./packages/protocol/docs/README.md) — In-depth specifications of the Taiko protocol for deeper understanding.
@@ -40,13 +40,8 @@ Get started with Taiko:
 | [ui-lib](./packages/ui-lib)                                                   | UI library.                                             | [![GitHub Release](https://img.shields.io/github/v/release/taikoxyz/taiko-mono?filter=ui-lib*&label=)](https://github.com/taikoxyz/taiko-mono/blob/main/packages/ui-lib/CHANGELOG.md)                                                   |
 
 ## Issues
-
-If you find a bug or have a feature request, please [open an issue](https://github.com/taikoxyz/taiko-mono/issues/new/choose).
+If you find a bug or have a feature request, please [open an issue](https://github.com/NethermindEth/surge-taiko-mono/issues/new/choose).
 
 ## Contributing
 
-Check out [CONTRIBUTING.md](./CONTRIBUTING.md) for details on how to contribute. You can also check out our grants cycle at [grants.taiko.xyz](https://grants.taiko.xyz).
-
-## Getting support
-
-Reach out to the community on [Discord](https://discord.gg/taikoxyz) if you need any help!
+Check out [CONTRIBUTING.md](./CONTRIBUTING.md) for details on how to contribute. 
