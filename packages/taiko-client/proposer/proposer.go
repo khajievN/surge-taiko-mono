@@ -201,6 +201,7 @@ func (p *Proposer) Close(_ context.Context) {
 
 // fetchPoolContent fetches the transaction pool content from L2 execution engine.
 func (p *Proposer) fetchPoolContent(filterPoolContent bool) ([]types.Transactions, error) {
+	log.Debug("fetchPoolContent")
 	var (
 		minTip  = p.MinTip
 		startAt = time.Now()
@@ -223,7 +224,7 @@ func (p *Proposer) fetchPoolContent(filterPoolContent bool) ([]types.Transaction
 		p.chainConfig,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch transaction pool content: %w", err)
+		return nil, fmt.Errorf("failed to fetch transaction pool content from rpc: %w", err)
 	}
 
 	metrics.ProposerPoolContentFetchTime.Set(time.Since(startAt).Seconds())
@@ -267,7 +268,7 @@ func (p *Proposer) fetchPoolContent(filterPoolContent bool) ([]types.Transaction
 			for _, tx := range txs {
 				sender, err := types.Sender(signer, tx)
 				if err != nil {
-					return nil, err
+					return nil, fmt.Errorf("failed to get sender: %w", err)
 				}
 
 				for _, localAddress := range p.LocalAddresses {
@@ -309,7 +310,7 @@ func (p *Proposer) ProposeOp(ctx context.Context) error {
 
 	txLists, err := p.fetchPoolContent(filterPoolContent)
 	if err != nil {
-		return err
+		return fmt.Errorf("ProposeOp: failed to fetch pool content: %w", err)
 	}
 
 	if len(txLists) == 0 {
