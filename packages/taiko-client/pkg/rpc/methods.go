@@ -318,14 +318,17 @@ func (c *Client) CalculateBaseFee(
 				return nil, fmt.Errorf("failed to fetch parent gas excess: %w", err)
 			}
 		}
+		blockTime := currentTimestamp - l2Head.Time
 		baseFeeInfo, err = c.TaikoL2.CalculateBaseFee(
 			&bind.CallOpts{BlockNumber: l2Head.Number, Context: ctx},
 			*baseFeeConfig,
-			currentTimestamp-l2Head.Time,
+			blockTime,
 			parentGasExcess,
 			uint32(l2Head.GasUsed),
 		)
 		if err != nil {
+			log.Debug("Calculate base fee params", "baseFeeConfig", baseFeeConfig, "blockTime", blockTime,
+				"parentGasExcess", parentGasExcess, "l2Head.GasUsed", l2Head.GasUsed)
 			return nil, fmt.Errorf("failed to calculate base fee by taiko l2: %w", err)
 		}
 	} else {
