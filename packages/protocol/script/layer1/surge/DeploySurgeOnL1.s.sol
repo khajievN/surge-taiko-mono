@@ -125,6 +125,7 @@ contract DeploySurgeOnL1 is DeployCapability {
         address taikoL2Address = getConstantAddress(vm.toString(l2ChainId), "10001");
         address l2SignalServiceAddress = getConstantAddress(vm.toString(l2ChainId), "5");
         address l2BridgeAddress = getConstantAddress(vm.toString(l2ChainId), "1");
+        address l2Erc20VaultAddress = getConstantAddress(vm.toString(l2ChainId), "2");
 
         // ---------------------------------------------------------------
         // Register L2 addresses
@@ -134,6 +135,7 @@ contract DeploySurgeOnL1 is DeployCapability {
         );
         register(sharedAddressManager, "signal_service", l2SignalServiceAddress, l2ChainId);
         register(sharedAddressManager, "bridge", l2BridgeAddress, l2ChainId);
+        register(sharedAddressManager, "erc20_vault", l2Erc20VaultAddress, l2ChainId);
 
 
         // ---------------------------------------------------------------
