@@ -107,7 +107,7 @@ def send_deposit_bond_transaction(nonce: int, private_key : str, account: Accoun
 
     # Sign and send the transaction
     signed_tx = w3.eth.account.sign_transaction(tx, private_key)
-    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
     print(f'Transaction sent: {tx_hash.hex()}')
 
 def deposit_for_proposer():
