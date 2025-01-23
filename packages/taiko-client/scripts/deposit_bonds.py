@@ -17,9 +17,7 @@ Setup:
 4. Create a .env file in the tools/tx_spammer directory with the following content:
    L1_PROPOSER_PRIVATE_KEY=<your_private_key>
    L1_PROVER_PRIVATE_KEY=<your_private_key>
-   PROPOSER_DEPOSIT_CONTRACT_ADDRESS=<proposer_deposit_contract_address>
-   PROVER_DEPOSIT_CONTRACT_ADDRESS=<prover_deposit_contract_address>
-   RECIPIENT_ADDRESS=<recipient_address>
+   TAIKO_L1_CONTRACT_ADDRESS=<taiko_l1_contract_address>
 
 5. Run the script:
    python deposit_bonds.py [--amount AMOUNT] [--rpc RPC_URL]
@@ -29,7 +27,6 @@ CLI Parameters:
 --rpc: RPC URL for the L1 network
 """
 
-
 import json
 from web3 import Web3
 import os
@@ -37,7 +34,6 @@ from dotenv import load_dotenv
 import argparse
 from eth_account import Account
 
-# Load environment variables from .env file
 load_dotenv()
 
 l1_proposer_private_key = os.getenv('L1_PROPOSER_PRIVATE_KEY')
@@ -52,10 +48,30 @@ taiko_l1_contract_address = os.getenv('TAIKO_L1_CONTRACT_ADDRESS')
 if not taiko_l1_contract_address:
     raise Exception("Environment variable TAIKO_L1_CONTRACT_ADDRESS not set")
 
-parser = argparse.ArgumentParser(description='Spam transactions on the Taiko network.')
-parser.add_argument('--amount', type=float, default=1000, help='Amount of ETH to send for deposit bonds')
-parser.add_argument('--rpc', type=str, help='RPC URL for the L1 network')
-args = parser.parse_args()
+def parse_arguments():
+
+    parser = argparse.ArgumentParser(
+        description='Deposit bonds for Taiko network proposer and prover',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    
+    parser.add_argument(
+        '--amount',
+        type=float,
+        default=10.0,
+        help='Amount of ETH to send for deposit bonds'
+    )
+    
+    parser.add_argument(
+        '--rpc',
+        type=str,
+        required=True,
+        help='RPC URL for the L1 network'
+    )
+    
+    return parser.parse_args()
+
+args = parse_arguments()
 
 w3 = Web3(Web3.HTTPProvider(args.rpc))
 
@@ -91,7 +107,7 @@ def send_deposit_bond_transaction(nonce: int, private_key : str, account: Accoun
 
     # Sign and send the transaction
     signed_tx = w3.eth.account.sign_transaction(tx, private_key)
-    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
     print(f'Transaction sent: {tx_hash.hex()}')
 
 def deposit_for_proposer():
