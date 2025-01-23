@@ -318,15 +318,18 @@ func (c *Client) CalculateBaseFee(
 				return nil, fmt.Errorf("failed to fetch parent gas excess: %w", err)
 			}
 		}
+		blockTime := currentTimestamp - l2Head.Time
 		baseFeeInfo, err = c.TaikoL2.CalculateBaseFee(
 			&bind.CallOpts{BlockNumber: l2Head.Number, Context: ctx},
 			*baseFeeConfig,
-			currentTimestamp-l2Head.Time,
+			blockTime,
 			parentGasExcess,
 			uint32(l2Head.GasUsed),
 		)
 		if err != nil {
-			return nil, err
+			log.Debug("Calculate base fee params", "baseFeeConfig", baseFeeConfig, "blockTime", blockTime,
+				"parentGasExcess", parentGasExcess, "l2Head.GasUsed", l2Head.GasUsed)
+			return nil, fmt.Errorf("failed to calculate base fee by taiko l2: %w", err)
 		}
 	} else {
 		baseFeeInfo, err = c.TaikoL2.GetBasefee(
@@ -340,7 +343,7 @@ func (c *Client) CalculateBaseFee(
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get base fee by taiko l2: %w", err)
 	}
 
 	log.Info(
@@ -371,12 +374,12 @@ func (c *Client) GetPoolContent(
 
 	l1Head, err := c.L1.HeaderByNumber(ctx, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch L1 header: %w", err)
 	}
 
 	l2Head, err := c.L2.HeaderByNumber(ctx, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch L2 header: %w", err)
 	}
 
 	baseFee, err := c.CalculateBaseFee(
@@ -388,7 +391,7 @@ func (c *Client) GetPoolContent(
 		uint64(time.Now().Unix()),
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to calculate base fee: %w", err)
 	}
 
 	var localsArg []string

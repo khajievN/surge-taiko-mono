@@ -171,7 +171,7 @@ var (
 				},
 				{
 					Name: "maxGasIssuancePerBlock",
-					Type: "uint32",
+					Type: "uint64",
 				},
 			},
 		},
