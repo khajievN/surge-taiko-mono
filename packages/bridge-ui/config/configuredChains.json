@@ -7,7 +7,7 @@
         "icon": "https://cdn.worldvectorlogo.com/logos/ethereum-eth.svg",
         "rpcUrls": {
           "default": {
-            "http": ["https://host/l1-rpc/"]
+            "http": ["https://l1-rpc.surge.staging-nethermind.xyz/execution"]
           }
         },
         "nativeCurrency": {
@@ -30,7 +30,7 @@
         "icon": "https://cdn.worldvectorlogo.com/logos/ethereum-eth.svg",
         "rpcUrls": {
           "default": {
-            "http": ["https://host/l2-rpc/"]
+            "http": ["https://l2-rpc.surge.staging-nethermind.xyz/"]
           }
         },
         "nativeCurrency": {
@@ -41,7 +41,7 @@
         "blockExplorers": {
           "default": {
             "name": "Surge Explorer",
-            "url": "https://surge.taiko.xyz/"
+            "url": "https://explorer.holesky.surge.wtf/"
           }
         }
       }
