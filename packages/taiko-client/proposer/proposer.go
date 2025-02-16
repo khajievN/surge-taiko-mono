@@ -783,7 +783,6 @@ func (p *Proposer) estimateTotalCosts(proposingCosts *big.Int) (*big.Int, error)
 		"proposingCosts", proposingCosts,
 		"gasNeededForProving", p.GasNeededForProvingBlock,
 		"priceFluctuation", p.PriceFluctuationModifier,
-		"percentOfBaseFee", p.PercentOfBaseFee,
 		"offChainCosts", p.OffChainCosts,
 	)
 
