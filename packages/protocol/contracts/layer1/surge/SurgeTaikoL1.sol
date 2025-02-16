@@ -26,7 +26,7 @@ contract SurgeTaikoL1 is TaikoL1 {
             maxAnchorHeightOffset: 64,
             baseFeeConfig: LibSharedData.BaseFeeConfig({
                 adjustmentQuotient: 8,
-                sharingPctg: 75,
+                sharingPctg: 0,
                 gasIssuancePerSecond: 100_000_000,
                 minGasExcess: 31_136_000_000, // Resolves to ~0.09992 Gwei
                 maxGasIssuancePerBlock: 6_000_000_000

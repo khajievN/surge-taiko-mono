@@ -20,7 +20,7 @@ contract DevnetTaikoL1 is TaikoL1 {
             maxAnchorHeightOffset: 64,
             baseFeeConfig: LibSharedData.BaseFeeConfig({
                 adjustmentQuotient: 8,
-                sharingPctg: 75,
+                sharingPctg: 0,
                 gasIssuancePerSecond: 5_000_000,
                 minGasExcess: 1_340_000_000,
                 maxGasIssuancePerBlock: 600_000_000
