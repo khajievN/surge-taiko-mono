@@ -658,21 +658,21 @@ func (p *Proposer) calculateTotalL2TransactionsFees(txLists []types.Transactions
 
 	for _, txs := range txLists {
 		for _, tx := range txs {
-			baseFee := get75PercentOf(tx.GasFeeCap())
+			baseFee := p.getPercentageFromBaseFeeToTheProposer(tx.GasFeeCap())
 			multiplier := new(big.Int).Add(tx.GasTipCap(), baseFee)
 			gasConsumed := new(big.Int).Mul(multiplier, baseFee)
 			totalGasConsumed.Add(totalGasConsumed, gasConsumed)
 		}
 	}
-
 	return totalGasConsumed, nil
 }
 
-func get75PercentOf(num *big.Int) *big.Int {
-	// First multiply by 3 to get 75% (as 3/4 = 75%)
-	result := new(big.Int).Mul(num, big.NewInt(3))
-	// Then divide by 4
-	return new(big.Int).Div(result, big.NewInt(4))
+func (p *Proposer) getPercentageFromBaseFeeToTheProposer(num *big.Int) *big.Int {
+	if p.PercentOfBaseFee == 0 {
+		return big.NewInt(0)
+	}
+	result := new(big.Int).Mul(num, big.NewInt(int64(p.PercentOfBaseFee)))
+	return new(big.Int).Div(result, big.NewInt(100))
 }
 
 func (p *Proposer) getBlobTxCost(txCandidate *txmgr.TxCandidate) (*big.Int, error) {
@@ -782,6 +782,7 @@ func (p *Proposer) estimateTotalCosts(proposingCosts *big.Int) (*big.Int, error)
 		"proposingCosts", proposingCosts,
 		"gasNeededForProving", p.GasNeededForProvingBlock,
 		"priceFluctuation", p.PriceFluctuationModifier,
+		"percentOfBaseFee", p.PercentOfBaseFee,
 		"offChainCosts", p.OffChainCosts,
 	)
 

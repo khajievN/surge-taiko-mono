@@ -142,6 +142,14 @@ var (
 		EnvVars:  []string{"PRICE_FLUCTUATION_MODIFIER"},
 	}
 
+	PercentOfBaseFee = &cli.UintFlag{
+		Name:     "percentOfBaseFee",
+		Usage:    "Percent of BaseFee given to proposer",
+		Value:    0,
+		Category: proposerCategory,
+		EnvVars:  []string{"PERCENT_OF_BASE_FEE"},
+	}
+
 	OffChainCosts = &cli.StringFlag{
 		Name:     "offChainCosts",
 		Usage:    "Off chain costs in WEI",

@@ -45,6 +45,7 @@ type Config struct {
 	AllowEmptyBlocks           bool
 	GasNeededForProvingBlock   uint64
 	PriceFluctuationModifier   uint64
+	PercentOfBaseFee           uint
 	OffChainCosts              *big.Int
 }
 
@@ -90,6 +91,7 @@ func NewConfigFromCliContext(c *cli.Context) (*Config, error) {
 	allowEmptyBlocks := c.Bool(flags.AllowEmptyBlocks.Name)
 	gasNeededForProvingBlock := c.Uint64(flags.GasNeededForProvingBlock.Name)
 	priceFluctuationModifier := c.Uint64(flags.PriceFluctuationModifier.Name)
+	percentOfBaseFee := c.Uint(flags.PercentOfBaseFee.Name)
 
 	offChainCosts, ok := new(big.Int).SetString(c.String(flags.OffChainCosts.Name), 10)
 	if !ok {
@@ -141,6 +143,7 @@ func NewConfigFromCliContext(c *cli.Context) (*Config, error) {
 		AllowEmptyBlocks:         allowEmptyBlocks,
 		GasNeededForProvingBlock: gasNeededForProvingBlock,
 		PriceFluctuationModifier: priceFluctuationModifier,
+		PercentOfBaseFee:         percentOfBaseFee,
 		OffChainCosts:            offChainCosts,
 	}, nil
 }
