@@ -654,17 +654,18 @@ func (p *Proposer) isProfitable(txLists []types.Transactions, proposingCosts *bi
 }
 
 func (p *Proposer) calculateTotalL2TransactionsFees(txLists []types.Transactions) (*big.Int, error) {
-	totalGasConsumed := new(big.Int)
+	totalFeesCollected := new(big.Int)
 
 	for _, txs := range txLists {
 		for _, tx := range txs {
 			baseFee := p.getPercentageFromBaseFeeToTheProposer(tx.GasFeeCap())
-			multiplier := new(big.Int).Add(tx.GasTipCap(), baseFee)
-			gasConsumed := new(big.Int).Mul(multiplier, baseFee)
-			totalGasConsumed.Add(totalGasConsumed, gasConsumed)
+			tipFeeWithBaseFee := new(big.Int).Add(tx.GasTipCap(), baseFee)
+			gasConsumed := big.NewInt(int64(tx.Gas()))
+			feesFromTx := new(big.Int).Mul(gasConsumed, tipFeeWithBaseFee)
+			totalFeesCollected.Add(totalFeesCollected, feesFromTx)
 		}
 	}
-	return totalGasConsumed, nil
+	return totalFeesCollected, nil
 }
 
 func (p *Proposer) getPercentageFromBaseFeeToTheProposer(num *big.Int) *big.Int {
