@@ -668,10 +668,10 @@ func (p *Proposer) calculateTotalL2TransactionsFees(txLists []types.Transactions
 }
 
 func (p *Proposer) getPercentageFromBaseFeeToTheProposer(num *big.Int) *big.Int {
-	if p.PercentOfBaseFee == 0 {
+	if p.chainConfig.ProtocolConfigs.BaseFeeConfig.SharingPctg == 0 {
 		return big.NewInt(0)
 	}
-	result := new(big.Int).Mul(num, big.NewInt(int64(p.PercentOfBaseFee)))
+	result := new(big.Int).Mul(num, big.NewInt(int64(p.chainConfig.ProtocolConfigs.BaseFeeConfig.SharingPctg)))
 	return new(big.Int).Div(result, big.NewInt(100))
 }
 
