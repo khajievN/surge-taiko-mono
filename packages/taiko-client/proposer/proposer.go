@@ -654,25 +654,26 @@ func (p *Proposer) isProfitable(txLists []types.Transactions, proposingCosts *bi
 }
 
 func (p *Proposer) calculateTotalL2TransactionsFees(txLists []types.Transactions) (*big.Int, error) {
-	totalGasConsumed := new(big.Int)
+	totalFeesCollected := new(big.Int)
 
 	for _, txs := range txLists {
 		for _, tx := range txs {
-			baseFee := get75PercentOf(tx.GasFeeCap())
-			multiplier := new(big.Int).Add(tx.GasTipCap(), baseFee)
-			gasConsumed := new(big.Int).Mul(multiplier, baseFee)
-			totalGasConsumed.Add(totalGasConsumed, gasConsumed)
+			baseFee := p.getPercentageFromBaseFeeToTheProposer(tx.GasFeeCap())
+			tipFeeWithBaseFee := new(big.Int).Add(tx.GasTipCap(), baseFee)
+			gasConsumed := big.NewInt(int64(tx.Gas()))
+			feesFromTx := new(big.Int).Mul(gasConsumed, tipFeeWithBaseFee)
+			totalFeesCollected.Add(totalFeesCollected, feesFromTx)
 		}
 	}
-
-	return totalGasConsumed, nil
+	return totalFeesCollected, nil
 }
 
-func get75PercentOf(num *big.Int) *big.Int {
-	// First multiply by 3 to get 75% (as 3/4 = 75%)
-	result := new(big.Int).Mul(num, big.NewInt(3))
-	// Then divide by 4
-	return new(big.Int).Div(result, big.NewInt(4))
+func (p *Proposer) getPercentageFromBaseFeeToTheProposer(num *big.Int) *big.Int {
+	if p.chainConfig.ProtocolConfigs.BaseFeeConfig.SharingPctg == 0 {
+		return big.NewInt(0)
+	}
+	result := new(big.Int).Mul(num, big.NewInt(int64(p.chainConfig.ProtocolConfigs.BaseFeeConfig.SharingPctg)))
+	return new(big.Int).Div(result, big.NewInt(100))
 }
 
 func (p *Proposer) getBlobTxCost(txCandidate *txmgr.TxCandidate) (*big.Int, error) {
