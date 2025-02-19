@@ -232,13 +232,15 @@ func (p *Proposer) fetchPoolContent(filterPoolContent bool) ([]types.Transaction
 	txLists := []types.Transactions{}
 
 	if !p.initDone {
+		log.Debug("Initializing proposer")
 		lastL2Header, err := p.rpc.L2.HeaderByNumber(p.ctx, nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get last L2 header: %w", err)
 		}
-		if lastL2Header.Number == big.NewInt(0) {
+		if lastL2Header.Number.Cmp(common.Big0) == 0 {
 			log.Info("Proposing init block!")
 			txLists = append(txLists, types.Transactions{})
+			return txLists, nil
 		}
 		p.initDone = true
 	}
@@ -481,21 +483,32 @@ func (p *Proposer) ProposeTxListOntake(
 		return errors.New("insufficient prover balance")
 	}
 
-	txCandidate, cost, err := p.buildCheaperOnTakeTransaction(ctx, txListsBytesArray, p.isEmptyBlock(txLists))
-	if err != nil {
-		log.Warn("Failed to build TaikoL1.proposeBlocksV2 transaction", "error", encoding.TryParsingCustomError(err))
-		return err
-	}
+	var txCandidate *txmgr.TxCandidate
+	var cost *big.Int
 
-	if p.checkProfitability {
-		profitable, err := p.isProfitable(totalTransactionFees, cost)
+	if p.initDone {
+		txCandidate, cost, err = p.buildCheaperOnTakeTransaction(ctx, txListsBytesArray, isEmptyBlock(txLists))
+		if err != nil {
+			log.Warn("Failed to build TaikoL1.proposeBlocksV2 transaction", "error", encoding.TryParsingCustomError(err))
+			return err
+		}
+
+		if p.checkProfitability {
+			profitable, err := p.isProfitable(totalTransactionFees, cost)
+			if err != nil {
+				return err
+			}
+			if !profitable {
+				log.Info("Proposing transaction is not profitable")
+				return nil
+			}
+		}
+	} else {
+		txCandidate, err = p.txCallDataBuilder.BuildOntake(ctx, txListsBytesArray)
 		if err != nil {
 			return err
 		}
-		if !profitable {
-			log.Info("Proposing transaction is not profitable")
-			return nil
-		}
+		p.initDone = true
 	}
 
 	if err := p.sendTx(ctx, txCandidate); err != nil {
@@ -541,7 +554,7 @@ func (p *Proposer) buildCheaperOnTakeTransaction(ctx context.Context,
 	return tx, cost, nil
 }
 
-func (p *Proposer) isEmptyBlock(txLists []types.Transactions) bool {
+func isEmptyBlock(txLists []types.Transactions) bool {
 	for _, txs := range txLists {
 		for _, tx := range txs {
 			if tx.To() != nil {
