@@ -291,8 +291,12 @@ contract TaikoL1 is EssentialContract, ITaikoL1, TaikoEvents {
 
     /// @inheritdoc ITaikoL1
     // Surge: Stage-2 requirement
-    function getLastVerificationTimestamp() external view returns(uint256) {
-        return state.lastVerificationTimestamp;
+    function getVerificationStreakStartAt() external view returns(uint256) {
+        if(state.blocks[state.slotB.lastVerifiedBlockId].proposedAt > getConfig().maxLivenessDisruptionPeriod) {
+            return block.timestamp;
+        } else {
+            return state.verificationStreakStartedAt;
+        }
     }
 
     /// @inheritdoc ITaikoL1
@@ -314,7 +318,9 @@ contract TaikoL1 is EssentialContract, ITaikoL1, TaikoEvents {
                 minGasExcess: 1_340_000_000,
                 maxGasIssuancePerBlock: 600_000_000 // two minutes
              }),
-            ontakeForkHeight: 1
+            ontakeForkHeight: 1,
+            // Surge: Default value
+            maxLivenessDisruptionPeriod: 7 days 
         });
     }
 
