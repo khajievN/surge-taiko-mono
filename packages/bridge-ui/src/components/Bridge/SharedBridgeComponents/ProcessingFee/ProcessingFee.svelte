@@ -267,7 +267,6 @@
                   disabled={!hasEnoughEth}
                   value={ProcessingFeeMethod.NONE}
                   name="processingFeeMethod"
-                  on:click={() => (tempProcessingFeeMethod = ProcessingFeeMethod.NONE)}
                   bind:group={tempProcessingFeeMethod} />
               </div>
 
