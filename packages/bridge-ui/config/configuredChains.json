@@ -1,13 +1,13 @@
 {
   "configuredChains": [
     {
-      "3151908": {
+      "17000": {
         "name": "Holesky",
         "type": "L1",
         "icon": "https://cdn.worldvectorlogo.com/logos/ethereum-eth.svg",
         "rpcUrls": {
           "default": {
-            "http": ["https://host/l1-rpc/"]
+            "http": ["https://l1-rpc.surge.staging-nethermind.xyz/execution"]
           }
         },
         "nativeCurrency": {
@@ -17,31 +17,31 @@
         },
         "blockExplorers": {
           "default": {
-            "name": "Explorer 1",
-            "url": ""
+            "name": "Holesky Explorer",
+            "url": "https://holesky.etherscan.io"
           }
         }
       }
     },
     {
       "763374": {
-        "name": "Surge",
+        "name": "Surge Testnet",
         "type": "L2",
         "icon": "https://cdn.worldvectorlogo.com/logos/ethereum-eth.svg",
         "rpcUrls": {
           "default": {
-            "http": ["https://host/l2-rpc/"]
+            "http": ["https://l2-rpc.surge.staging-nethermind.xyz"]
           }
         },
         "nativeCurrency": {
-          "name": "SurgeETH",
-          "symbol": "sETH",
+          "name": "ETH",
+          "symbol": "ETH",
           "decimals": 18
         },
         "blockExplorers": {
           "default": {
-            "name": "Explorer 2",
-            "url": ""
+            "name": "Surge Explorer",
+            "url": "https://explorer.holesky.surge.wtf"
           }
         }
       }
