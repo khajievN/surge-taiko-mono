@@ -94,7 +94,7 @@
   );
   $: desktopContainerClasses = classNames(commonContainerClasses, 'items-center');
   $: tabletContainerClasses = classNames(commonContainerClasses, 'cursor-pointer');
-  $: mobileContainerClasses = classNames(commonContainerClasses, 'cursor-pointer dashed-border');
+  $: mobileContainerClasses = classNames(commonContainerClasses, 'cursor-pointer');
 
   $: containerClasses = $isDesktop
     ? desktopContainerClasses
