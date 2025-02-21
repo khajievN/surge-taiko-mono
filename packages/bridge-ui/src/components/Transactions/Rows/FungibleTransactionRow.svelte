@@ -94,7 +94,7 @@
   );
   $: desktopContainerClasses = classNames(commonContainerClasses, 'items-center');
   $: tabletContainerClasses = classNames(commonContainerClasses, 'cursor-pointer');
-  $: mobileContainerClasses = classNames(commonContainerClasses, 'cursor-pointer dashed-border');
+  $: mobileContainerClasses = classNames(commonContainerClasses, 'cursor-pointer');
 
   $: containerClasses = $isDesktop
     ? desktopContainerClasses
@@ -108,30 +108,15 @@
     commonColumnClasses,
     'w-1/4 f-row  text-left start items-center text-sm space-y-[10px]',
   );
-  $: mobileColumnClasses = classNames(commonColumnClasses, 'w-1/3 justify-center f-col text-sm space-y-[10px]');
+  $: mobileColumnClasses = classNames(commonColumnClasses, 'w-1/2 justify-center f-col text-sm space-y-[10px]');
 
   $: columnClasses = $isDesktop ? desktopColumnClasses : $isTablet ? tabletColumnClasses : mobileColumnClasses;
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class={containerClasses} on:click={openDetails} {...attrs}>
-  <!-- Mobile -->
-  {#if $isMobile}
-    <div class="before-circle"></div>
-    <div class="after-circle"></div>
-    <div class={`${columnClasses} !items-start pl-[10px]`}>
-      <div class="f-row md:hidden">
-        <ChainSymbol class="min-w-[24px]" chainId={bridgeTx.srcChainId} />
-        {shortenAddress(bridgeTx.message?.from, 4, 3)}
-      </div>
-      <div class="f-row md:hidden">
-        <ChainSymbol class="min-w-[24px]" chainId={bridgeTx.destChainId} />
-        {shortenAddress(bridgeTx.message?.to, 4, 3)}
-      </div>
-    </div>
-
     <!-- Desktop -->
-  {:else if $isDesktop || $isTablet}
+  {#if $isDesktop || $isTablet}
     <div class={`${columnClasses}`}>
       <ChainSymbol class="min-w-[24px]" chainId={bridgeTx.srcChainId} />
       {shortenAddress(bridgeTx.message?.from)}
