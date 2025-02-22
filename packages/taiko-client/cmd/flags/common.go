@@ -156,7 +156,7 @@ var (
 		EnvVars:  []string{"PROVER_SET"},
 	}
 	InboxAddress = &cli.StringFlag{
-		Name:     "inboc",
+		Name:     "inbox",
 		Usage:    "Inbox contract `address`",
 		Value:    rpc.ZeroAddress.Hex(),
 		Category: commonCategory,
