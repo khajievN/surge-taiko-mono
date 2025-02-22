@@ -155,6 +155,13 @@ var (
 		Category: commonCategory,
 		EnvVars:  []string{"PROVER_SET"},
 	}
+	InboxAddress = &cli.StringFlag{
+		Name:     "inboc",
+		Usage:    "Inbox contract `address`",
+		Value:    rpc.ZeroAddress.Hex(),
+		Category: commonCategory,
+		EnvVars:  []string{"INBOX"},
+	}
 )
 
 // CommonFlags All common flags.
