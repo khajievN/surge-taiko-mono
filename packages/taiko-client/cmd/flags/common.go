@@ -181,6 +181,7 @@ var CommonFlags = []cli.Flag{
 	BackOffRetryInterval,
 	RPCTimeout,
 	L1PrivateEndpoint,
+	InboxAddress,
 }
 
 // MergeFlags merges the given flag slices.
