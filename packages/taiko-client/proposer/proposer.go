@@ -67,6 +67,7 @@ type Proposer struct {
 
 	allowEmptyBlocks bool
 	initDone         bool
+	forceProposeOnce bool
 }
 
 // InitFromCli initializes the given proposer instance based on the command line flags.
@@ -156,7 +157,44 @@ func (p *Proposer) InitFromConfig(
 		p.txBlobBuilder = nil
 		p.defaultTxBuilder = p.txCallDataBuilder
 	}
+	if (cfg.ClientConfig.InboxAddress != common.Address{}) {
+		if err := p.SubscribeToSignalSentEvent(); err != nil {
+			return err
+		}
+	}
 
+	return nil
+}
+
+// subscribe to SignalSent event on eth l1 RPC
+func (p *Proposer) SubscribeToSignalSentEvent() error {
+	logChan := make(chan types.Log)
+	sub, err := p.rpc.L1.SubscribeFilterLogs(p.ctx, ethereum.FilterQuery{
+		Addresses: []common.Address{p.Config.InboxAddress},
+		Topics:    [][]common.Hash{{common.HexToHash("0x0ad2d108660a211f47bf7fb43a0443cae181624995d3d42b88ee6879d200e973")}},
+	}, logChan)
+	if err != nil {
+		return fmt.Errorf("subscribe error: %w", err)
+	}
+
+	p.wg.Add(1)
+	go func() {
+		defer p.wg.Done()
+		defer sub.Unsubscribe()
+
+		for {
+			select {
+			case <-p.ctx.Done():
+				return
+			case err := <-sub.Err():
+				log.Error("subscription error", "err", err)
+				return
+			case vLog := <-logChan:
+				log.Info("SignalSent event received", "log", vLog)
+				p.forceProposeOnce = true
+			}
+		}
+	}()
 	return nil
 }
 
@@ -231,14 +269,14 @@ func (p *Proposer) fetchPoolContent(filterPoolContent bool) ([]types.Transaction
 
 	txLists := []types.Transactions{}
 
-	if !p.initDone {
-		log.Debug("Initializing proposer")
+	if !p.initDone || p.forceProposeOnce {
+		log.Debug("Initializing proposer or force proposing once")
 		lastL2Header, err := p.rpc.L2.HeaderByNumber(p.ctx, nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get last L2 header: %w", err)
 		}
-		if lastL2Header.Number.Cmp(common.Big0) == 0 {
-			log.Info("Proposing init block!")
+		if lastL2Header.Number.Cmp(common.Big0) == 0 || p.forceProposeOnce {
+			log.Info("Proposing empty block if there are no other txs")
 			txLists = append(txLists, types.Transactions{})
 			return txLists, nil
 		}
@@ -486,7 +524,7 @@ func (p *Proposer) ProposeTxListOntake(
 	var txCandidate *txmgr.TxCandidate
 	var cost *big.Int
 
-	if p.initDone {
+	if p.initDone && !p.forceProposeOnce {
 		txCandidate, cost, err = p.buildCheaperOnTakeTransaction(ctx, txListsBytesArray, isEmptyBlock(txLists))
 		if err != nil {
 			log.Warn("Failed to build TaikoL1.proposeBlocksV2 transaction", "error", encoding.TryParsingCustomError(err))
@@ -509,6 +547,7 @@ func (p *Proposer) ProposeTxListOntake(
 			return err
 		}
 		p.initDone = true
+		p.forceProposeOnce = false
 	}
 
 	if err := p.sendTx(ctx, txCandidate); err != nil {
