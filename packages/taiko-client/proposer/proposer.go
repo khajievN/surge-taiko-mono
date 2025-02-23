@@ -269,14 +269,14 @@ func (p *Proposer) fetchPoolContent(filterPoolContent bool) ([]types.Transaction
 
 	txLists := []types.Transactions{}
 
-	if !p.initDone {
-		log.Debug("Initializing proposer")
+	if !p.initDone || p.forceProposeOnce {
+		log.Debug("Initializing proposer or force proposing once")
 		lastL2Header, err := p.rpc.L2.HeaderByNumber(p.ctx, nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get last L2 header: %w", err)
 		}
-		if lastL2Header.Number.Cmp(common.Big0) == 0 {
-			log.Info("Proposing init block!")
+		if lastL2Header.Number.Cmp(common.Big0) == 0 || p.forceProposeOnce {
+			log.Info("Proposing empty block if there are no other txs")
 			txLists = append(txLists, types.Transactions{})
 			return txLists, nil
 		}
