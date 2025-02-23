@@ -546,13 +546,13 @@ func (p *Proposer) ProposeTxListOntake(
 		if err != nil {
 			return err
 		}
-		p.initDone = true
-		p.forceProposeOnce = false
 	}
 
 	if err := p.sendTx(ctx, txCandidate); err != nil {
 		return err
 	}
+	p.initDone = true
+	p.forceProposeOnce = false
 
 	log.Info("📝 Batch propose transactions succeeded", "totalTxs", totalTxs)
 
