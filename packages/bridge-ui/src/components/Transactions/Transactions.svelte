@@ -31,8 +31,6 @@
   import { StatusFilterDialog, StatusFilterDropdown } from './Filter';
   import { FungibleTransactionRow, NftTransactionRow } from './Rows/';
   import { StatusInfoDialog } from './Status';
-  import { connectedSourceChain } from '$stores/network';
-
 
   let transactions: BridgeTransaction[] = [];
 
@@ -91,7 +89,7 @@
   const updateTransactions = async (address: Address) => {
     if (loadingTxs) return;
     loadingTxs = true;
-    const { mergedTransactions, outdatedLocalTransactions, error } = await fetchTransactions(address, $connectedSourceChain?.id);
+    const { mergedTransactions, outdatedLocalTransactions, error } = await fetchTransactions(address);
     transactions = mergedTransactions;
 
     if (outdatedLocalTransactions.length > 0) {
@@ -118,6 +116,7 @@
   );
 
   $: transactionsToShow = getTransactionsToShow(currentPage, pageSize, tokenAndStatusFilteredTransactions);
+  
 
   $: fungibleView = $activeBridge === BridgeTypes.FUNGIBLE;
   $: nftView = $activeBridge === BridgeTypes.NFT;
@@ -150,6 +149,7 @@
       $destNetwork = chainIdToChain(alternateChainID);
     }
   });
+
 </script>
 
 <div class="flex flex-col justify-center w-full">

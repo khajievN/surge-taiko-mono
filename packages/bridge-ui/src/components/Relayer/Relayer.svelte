@@ -11,8 +11,6 @@
   import { TokenType } from '$libs/token';
   import { getLogger } from '$libs/util/logger';
   import { type Account, account } from '$stores/account';
-  import { connectedSourceChain } from '$stores/network';
-
 
   const log = getLogger('RelayerComponent');
 
@@ -41,7 +39,7 @@
     log('fetchTxForAddress');
     fetching = true;
     if (addressToSearch) {
-      const { mergedTransactions } = await fetchTransactions(addressToSearch, $connectedSourceChain?.id);
+      const { mergedTransactions } = await fetchTransactions(addressToSearch);
       log('mergedTransactions', mergedTransactions);
       if (mergedTransactions.length > 0) {
         transactions = mergedTransactions;
