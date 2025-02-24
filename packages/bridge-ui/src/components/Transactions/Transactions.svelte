@@ -31,6 +31,7 @@
   import { StatusFilterDialog, StatusFilterDropdown } from './Filter';
   import { FungibleTransactionRow, NftTransactionRow } from './Rows/';
   import { StatusInfoDialog } from './Status';
+  import { connectedSourceChain } from '$stores/network';
 
   let transactions: BridgeTransaction[] = [];
 
@@ -89,7 +90,7 @@
   const updateTransactions = async (address: Address) => {
     if (loadingTxs) return;
     loadingTxs = true;
-    const { mergedTransactions, outdatedLocalTransactions, error } = await fetchTransactions(address);
+    const { mergedTransactions, outdatedLocalTransactions, error } = await fetchTransactions(address, $connectedSourceChain?.id);
     transactions = mergedTransactions;
 
     if (outdatedLocalTransactions.length > 0) {
