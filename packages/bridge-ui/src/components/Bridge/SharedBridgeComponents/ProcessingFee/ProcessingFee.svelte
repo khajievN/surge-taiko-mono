@@ -138,7 +138,7 @@
 
   const onCustomClick = () => {
     inputBox?.setValue(formatEther(recommendedAmount));
-  }
+  };
 
   $: {
     updateProcessingFee($processingFeeMethod, recommendedAmount);
@@ -303,16 +303,17 @@
                 name="processingFeeMethod"
                 bind:group={tempProcessingFeeMethod} />
             </li>
-            <div style="display: {tempProcessingFeeMethod === ProcessingFeeMethod.CUSTOM ? 'block' : 'none'}" class="relative f-items-center my-[20px]">
-                <InputBox
-                  type="number"
-                  min="0"
-                  disabled={tempProcessingFeeMethod !== ProcessingFeeMethod.CUSTOM}
-                  class="w-full input-box p-6 pr-16 title-subsection-bold placeholder:text-tertiary-content"
-                  on:input={inputProcessFee}
-                  bind:this={inputBox}
-                />
-                <span class="absolute top-7 right-6 uppercase body-bold text-secondary-content">ETH</span>
+            <div
+              style="display: {tempProcessingFeeMethod === ProcessingFeeMethod.CUSTOM ? 'block' : 'none'}"
+              class="relative f-items-center my-[20px]">
+              <InputBox
+                type="number"
+                min="0"
+                disabled={tempProcessingFeeMethod !== ProcessingFeeMethod.CUSTOM}
+                class="w-full input-box p-6 pr-16 title-subsection-bold placeholder:text-tertiary-content"
+                on:input={inputProcessFee}
+                bind:this={inputBox} />
+              <span class="absolute top-7 right-6 uppercase body-bold text-secondary-content">ETH</span>
             </div>
 
             {#if tempProcessingFeeMethod === ProcessingFeeMethod.CUSTOM}

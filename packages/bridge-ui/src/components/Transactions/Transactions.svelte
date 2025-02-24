@@ -116,7 +116,6 @@
   );
 
   $: transactionsToShow = getTransactionsToShow(currentPage, pageSize, tokenAndStatusFilteredTransactions);
-  
 
   $: fungibleView = $activeBridge === BridgeTypes.FUNGIBLE;
   $: nftView = $activeBridge === BridgeTypes.NFT;
@@ -149,7 +148,6 @@
       $destNetwork = chainIdToChain(alternateChainID);
     }
   });
-
 </script>
 
 <div class="flex flex-col justify-center w-full">
