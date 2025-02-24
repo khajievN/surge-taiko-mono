@@ -27,16 +27,16 @@ export const mergeAndCaptureOutdatedTransactions = (
     mergedTransactions.push(tx);
   }
 
-  return { 
-    mergedTransactions: removeDuplicates(mergedTransactions), 
-    outdatedLocalTransactions: removeDuplicates(outdatedLocalTransactions) 
+  return {
+    mergedTransactions: removeDuplicates(mergedTransactions),
+    outdatedLocalTransactions: removeDuplicates(outdatedLocalTransactions),
   };
 };
 
 const removeDuplicates = (transactions: BridgeTransaction[]) => {
-  const idTxMap = new Map()
-  for(let tx of transactions) {
-    idTxMap.set(tx.srcTxHash, tx)
+  const idTxMap = new Map();
+  for (const tx of transactions) {
+    idTxMap.set(tx.srcTxHash, tx);
   }
-  return Array.from(idTxMap.values())
-}
+  return Array.from(idTxMap.values());
+};
