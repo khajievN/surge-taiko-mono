@@ -41,7 +41,7 @@
         "blockExplorers": {
           "default": {
             "name": "Surge Explorer",
-            "url": "https://explorer.holesky.surge.wtf"
+            "url": "https://explorer.testnet.surge.wtf"
           }
         }
       }
