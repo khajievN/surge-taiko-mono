@@ -86,7 +86,7 @@ var (
 		BaseFeeConfig: bindings.LibSharedDataBaseFeeConfig{
 			AdjustmentQuotient:     8,
 			GasIssuancePerSecond:   50_000_000,
-			MinGasExcess:           31_136_000_000,
+			MinGasExcess:           15_291_000_000,
 			MaxGasIssuancePerBlock: 6_000_000_000,
 		},
 		MaxLivenessDisruptionPeriod: 604800,
@@ -105,7 +105,7 @@ var (
 		BaseFeeConfig: bindings.LibSharedDataBaseFeeConfig{
 			AdjustmentQuotient:     8,
 			GasIssuancePerSecond:   50_000_000,
-			MinGasExcess:           31_136_000_000,
+			MinGasExcess:           15_291_000_000,
 			MaxGasIssuancePerBlock: 6_000_000_000,
 		},
 		MaxLivenessDisruptionPeriod: 604800,
@@ -123,7 +123,7 @@ var (
 		BaseFeeConfig: bindings.LibSharedDataBaseFeeConfig{
 			AdjustmentQuotient:     8,
 			GasIssuancePerSecond:   50_000_000,
-			MinGasExcess:           31_136_000_000,
+			MinGasExcess:           15_291_000_000,
 			MaxGasIssuancePerBlock: 6_000_000_000,
 		},
 		MaxLivenessDisruptionPeriod: 604800,
