@@ -2,7 +2,7 @@
   "configuredChains": [
     {
       "560048": {
-        "name": "Holesky",
+        "name": "Hoodi",
         "type": "L1",
         "icon": "https://cdn.worldvectorlogo.com/logos/ethereum-eth.svg",
         "rpcUrls": {
