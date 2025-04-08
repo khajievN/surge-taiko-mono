@@ -18,7 +18,7 @@
         "blockExplorers": {
           "default": {
             "name": "Hoodi Explorer",
-            "url": "https://hoodi.cloud.blockscout.com"
+            "url": "https://hoodi.etherscan.io"
           }
         }
       }
