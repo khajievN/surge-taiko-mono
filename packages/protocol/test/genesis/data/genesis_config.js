@@ -1,10 +1,9 @@
 "use strict";
 const ADDRESS_LENGTH = 40;
 
-const ownerAddress = process.env.CONTRACT_OWNER;
-const L1_CHAINID = process.env.L1_CHAINID;
-const L2_CHAINID = process.env.L2_CHAINID;
-// const ownerAddress = "0xF10bAd9d0c9226DE6595c4Aaca49b60b06F390f8";
+const ownerAddress = "";
+const L1_CHAINID = 0;
+const L2_CHAINID = 0;
 
 module.exports = {
   // Owner address of the pre-deployed L2 contracts.
