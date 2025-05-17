@@ -1,16 +1,17 @@
 "use strict";
 const ADDRESS_LENGTH = 40;
 
-const ownerAddress = process.env.CONTRACT_OWNER;
+// const ownerAddress = process.env.CONTRACT_OWNER;
+const ownerAddress = "0xF10bAd9d0c9226DE6595c4Aaca49b60b06F390f8";
 
 module.exports = {
   // Owner address of the pre-deployed L2 contracts.
   contractOwner: ownerAddress,
-  l1ChainId: parseInt(process.env.L1_CHAINID),
+  l1ChainId: 17000,
   // Chain ID of the Taiko L2 network.
-  chainId: parseInt(process.env.L2_CHAINID),
+  chainId: 763375,
   // Account address and pre-mint ETH amount as key-value pairs.
-  seedAccounts: [{ [ownerAddress]: 1000 }],
+  seedAccounts: [{ [ownerAddress]: 100000000 }],
   ownerSecurityCouncil: ownerAddress,
   ownerTimelockController: ownerAddress,
   get contractAddresses() {

@@ -15,7 +15,7 @@ contract DevnetTaikoL1 is TaikoL1 {
             blockRingBufferSize: 360_000,
             maxBlocksToVerify: 16,
             blockMaxGasLimit: 240_000_000,
-            livenessBond: 0.07 ether,
+            livenessBond: 0.0007 ether,
             stateRootSyncInternal: 16,
             maxAnchorHeightOffset: 64,
             baseFeeConfig: LibSharedData.BaseFeeConfig({

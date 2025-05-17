@@ -17,12 +17,17 @@ func (p *Processor) waitHeaderSynced(
 	hopChainId uint64,
 	blockNum uint64,
 ) (*relayer.Event, error) {
+	slog.Info("Starting waitHeaderSynced", "hopChainId", hopChainId, "blockNum", blockNum)
+
 	chainId, err := ethClient.ChainID(ctx)
 	if err != nil {
+		slog.Error("Failed to get chain ID", "error", err)
 		return nil, err
 	}
+	slog.Info("Retrieved chain ID", "chainId", chainId.Uint64())
 
 	// check once before ticker interval
+	slog.Info("Checking for ChainDataSynced event before starting ticker")
 	event, err := p.eventRepo.ChainDataSyncedEventByBlockNumberOrGreater(
 		ctx,
 		hopChainId,
@@ -30,26 +35,35 @@ func (p *Processor) waitHeaderSynced(
 		blockNum,
 	)
 	if err != nil {
+		slog.Error("Error querying ChainDataSyncedEventByBlockNumberOrGreater", "error", err)
 		return nil, err
 	}
 
 	if event != nil {
-		slog.Info("chainDataSynced done",
+		slog.Info("ChainDataSynced event found",
 			"syncedBlockID", event.BlockID,
 			"blockIDWaitingFor", blockNum,
 		)
-
 		return event, nil
 	}
 
+	slog.Info("No ChainDataSynced event found, starting ticker loop")
 	ticker := time.NewTicker(time.Duration(p.headerSyncIntervalSeconds) * time.Second)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ctx.Done():
+			slog.Warn("Context canceled while waiting for ChainDataSynced event")
 			return nil, ctx.Err()
 		case <-ticker.C:
+			slog.Info("Ticker triggered, checking for ChainDataSynced event")
+			slog.Info("Calling ChainDataSyncedEventByBlockNumberOrGreater",
+            	"ctx", ctx,
+            	"hopChainId", hopChainId,
+            	"syncedChainId", chainId.Uint64(),
+            	"blockNum", blockNum,
+            )
 			event, err := p.eventRepo.ChainDataSyncedEventByBlockNumberOrGreater(
 				ctx,
 				hopChainId,
@@ -57,17 +71,18 @@ func (p *Processor) waitHeaderSynced(
 				blockNum,
 			)
 			if err != nil {
+				slog.Error("Error querying ChainDataSyncedEventByBlockNumberOrGreater", "error", err)
 				return nil, err
 			}
 
 			if event != nil {
-				slog.Info("chainDataSynced done",
+				slog.Info("ChainDataSynced event found",
 					"syncedBlockID", event.BlockID,
 					"blockIDWaitingFor", blockNum,
 				)
-
 				return event, nil
 			}
+			slog.Info("No ChainDataSynced event found, continuing to wait")
 		}
 	}
 }

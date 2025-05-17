@@ -1,0 +1,53 @@
+version: "3.8"
+services:
+  db:
+    image: mysql:8.0
+    container_name: "relayer-db"
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=relayer
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - relayer_net
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: "relayer-rabbitmq"
+    environment:
+      - RABBITMQ_DEFAULT_USER=root
+      - RABBITMQ_DEFAULT_PASS=root
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+    volumes:
+      - ./rabbitmq/data/:/var/lib/rabbitmq/
+      - ./rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - relayer_net
+
+  migrations:
+    image: ghcr.io/kukymbr/goose-docker:3.22.1
+    environment:
+      - GOOSE_DRIVER=mysql
+      - GOOSE_DBSTRING=root:root@tcp(db:3306)/relayer
+    volumes:
+      - ./migrations:/migrations
+    networks:
+      - relayer_net
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  relayer_net:
+    driver: bridge

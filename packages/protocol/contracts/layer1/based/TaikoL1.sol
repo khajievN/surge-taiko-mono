@@ -308,7 +308,7 @@ contract TaikoL1 is EssentialContract, ITaikoL1, TaikoEvents {
             blockRingBufferSize: 360_000, // = 7200 * 50
             maxBlocksToVerify: 16,
             blockMaxGasLimit: 240_000_000,
-            livenessBond: 0.07 ether,
+            livenessBond: 0.0007 ether,
             stateRootSyncInternal: 1,
             maxAnchorHeightOffset: 64,
             baseFeeConfig: LibSharedData.BaseFeeConfig({
@@ -320,7 +320,7 @@ contract TaikoL1 is EssentialContract, ITaikoL1, TaikoEvents {
              }),
             ontakeForkHeight: 1,
             // Surge: Default value
-            maxLivenessDisruptionPeriod: 7 days 
+            maxLivenessDisruptionPeriod: 7 days
         });
     }
 

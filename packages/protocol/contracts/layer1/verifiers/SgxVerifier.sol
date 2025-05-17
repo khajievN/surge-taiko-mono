@@ -10,7 +10,8 @@ import "../based/ITaikoL1.sol";
 import "../based/TaikoData.sol";
 import "./LibPublicInput.sol";
 import "./IVerifier.sol";
-
+import "forge-std/src/console.sol";
+import "forge-std/src/console2.sol";
 /// @title SgxVerifier
 /// @notice This contract is the implementation of verifying SGX signature proofs
 /// onchain.
@@ -122,13 +123,16 @@ contract SgxVerifier is EssentialContract, IVerifier {
         returns (uint256)
     {
         address automataDcapAttestation = resolve(LibStrings.B_AUTOMATA_DCAP_ATTESTATION, true);
-
+        console.logString("automataDcapAttestation");
+        console.log(automataDcapAttestation);
         if (automataDcapAttestation == address(0)) {
             revert SGX_RA_NOT_SUPPORTED();
         }
 
         (bool verified,) = IAttestation(automataDcapAttestation).verifyParsedQuote(_attestation);
 
+        console.logString("verified");
+        console.logBool(verified);
         if (!verified) revert SGX_INVALID_ATTESTATION();
 
         address[] memory addresses = new address[](1);
@@ -145,7 +149,7 @@ contract SgxVerifier is EssentialContract, IVerifier {
     )
         external
         // Surge: Allow either TaikoL1 or the composite verifier to call this
-        onlyFromNamedEither(LibStrings.B_TAIKO, LibStrings.B_TIER_TWO_OF_THREE)
+        onlyFromNamedEither(LibStrings.B_TAIKO, LibStrings.B_TIER_SGX)
     {
 
         // Do not run proof verification to contest an existing proof
@@ -155,14 +159,14 @@ contract SgxVerifier is EssentialContract, IVerifier {
         // 4 bytes + 20 bytes + 65 bytes (signature) = 89
         if (_proof.data.length != 89) revert SGX_INVALID_PROOF();
 
-        uint32 id = uint32(bytes4(_proof.data[:4]));
-        address newInstance = address(bytes20(_proof.data[4:24]));
+        uint32 id = uint32(bytes4(_proof.data[: 4]));
+        address newInstance = address(bytes20(_proof.data[4 : 24]));
 
         address oldInstance = ECDSA.recover(
             LibPublicInput.hashPublicInputs(
                 _tran, address(this), newInstance, _ctx.prover, _ctx.metaHash, taikoChainId()
             ),
-            _proof.data[24:]
+            _proof.data[24 :]
         );
 
         if (!_isInstanceValid(id, oldInstance)) revert SGX_INVALID_INSTANCE();
@@ -179,7 +183,7 @@ contract SgxVerifier is EssentialContract, IVerifier {
     )
         external
         // Surge: Allow either TaikoL1 or the composite verifier to call this
-        onlyFromNamedEither(LibStrings.B_TAIKO, LibStrings.B_TIER_TWO_OF_THREE)
+        onlyFromNamedEither(LibStrings.B_TAIKO, LibStrings.B_TIER_SGX)
     {
         // Size is: 109 bytes
         // 4 bytes + 20 bytes + 20 bytes + 65 bytes (signature) = 109

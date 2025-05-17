@@ -15,11 +15,11 @@ contract SurgeTierRouter is SurgeTierProviderBase, ITierRouter {
     /// @inheritdoc ITierProvider
     function getTierIds() external pure returns (uint16[] memory tiers_) {
         tiers_ = new uint16[](1);
-        tiers_[0] = LibTiers.TIER_TWO_OF_THREE;
+        tiers_[0] = LibTiers.TIER_SGX;
     }
 
     /// @inheritdoc ITierProvider
     function getMinTier(address, uint256) public pure override returns (uint16) {
-        return LibTiers.TIER_TWO_OF_THREE;
+        return LibTiers.TIER_SGX;
     }
 }

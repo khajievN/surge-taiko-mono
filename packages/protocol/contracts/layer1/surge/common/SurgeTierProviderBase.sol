@@ -17,10 +17,10 @@ abstract contract SurgeTierProviderBase is ITierProvider {
 
     /// @inheritdoc ITierProvider
     function getTier(uint16 _tierId) public pure virtual returns (ITierProvider.Tier memory) {
-        if (_tierId == LibTiers.TIER_TWO_OF_THREE) {
+        if (_tierId == LibTiers.TIER_SGX) {
             // No validity or contestation period
             // 24 hours of proving window
-            return _buildTier(LibStrings.B_TIER_TWO_OF_THREE, 0, 0, 1440);
+            return _buildTier(LibStrings.B_TIER_SGX, 0, 0, 1440);
         }
 
         revert TIER_NOT_FOUND();

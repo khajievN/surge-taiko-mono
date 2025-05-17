@@ -76,6 +76,9 @@ contract SetDcapParams is Script, AttestationBase {
 
     function _registerSgxInstanceWithQuoteBytes() internal {
         bytes memory v3QuoteBytes = vm.envBytes("V3_QUOTE_BYTES");
+        console2.log("V3_QUOTE_BYTES: ", string(v3QuoteBytes));
+        console2.log("pemCertChainLibAddr: ", pemCertChainLibAddr);
+        console2.log("sgxVerifier: ", sgxVerifier);
         registerSgxInstanceWithQuoteBytes(pemCertChainLibAddr, sgxVerifier, v3QuoteBytes);
     }
 }

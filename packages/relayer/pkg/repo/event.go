@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strings"
-
+	"log/slog"
 	"github.com/morkid/paginate"
 	"github.com/pkg/errors"
 	"gorm.io/datatypes"
@@ -221,8 +221,22 @@ func (r *EventRepository) ChainDataSyncedEventByBlockNumberOrGreater(
 	syncedChainId uint64,
 	blockNumber uint64,
 ) (*relayer.Event, error) {
+	slog.Info("Starting ChainDataSyncedEventByBlockNumberOrGreater",
+		"srcChainId", srcChainId,
+		"syncedChainId", syncedChainId,
+		"blockNumber", blockNumber,
+	)
+
 	e := &relayer.Event{}
-	// find all message sent events
+	// Log the query parameters
+	slog.Info("Querying database for ChainDataSynced event",
+		"name", relayer.EventNameChainDataSynced,
+		"chain_id", srcChainId,
+		"synced_chain_id", syncedChainId,
+		"block_id >=", blockNumber,
+	)
+
+	// Execute the query
 	if err := r.db.GormDB().WithContext(ctx).Where("name = ?", relayer.EventNameChainDataSynced).
 		Where("chain_id = ?", srcChainId).
 		Where("synced_chain_id = ?", syncedChainId).
@@ -231,11 +245,25 @@ func (r *EventRepository) ChainDataSyncedEventByBlockNumberOrGreater(
 		Limit(1).
 		First(&e).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
+			slog.Warn("No ChainDataSynced event found",
+				"srcChainId", srcChainId,
+				"syncedChainId", syncedChainId,
+				"blockNumber", blockNumber,
+			)
 			return nil, nil
 		}
 
+		slog.Error("Error querying ChainDataSynced event", "error", err)
 		return nil, errors.Wrap(err, "r.db.First")
 	}
+
+	// Log the result
+	slog.Info("ChainDataSynced event found",
+		"eventID", e.ID,
+		"blockID", e.BlockID,
+		"srcChainId", srcChainId,
+		"syncedChainId", syncedChainId,
+	)
 
 	return e, nil
 }

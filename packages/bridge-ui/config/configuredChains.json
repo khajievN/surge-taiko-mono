@@ -1,0 +1,50 @@
+{
+  "configuredChains": [
+    {
+      "17000": {
+        "name": "Holesky",
+        "type": "L1",
+        "icon": "https://cdn.worldvectorlogo.com/logos/ethereum-eth.svg",
+        "rpcUrls": {
+          "default": {
+            "http": ["http://3.107.178.1:5052"]
+          }
+        },
+        "nativeCurrency": {
+          "name": "ETH",
+          "symbol": "ETH",
+          "decimals": 18
+        },
+        "blockExplorers": {
+          "default": {
+            "name": "Holesky Etherscan",
+            "url": "https://holesky.etherscan.io/"
+          }
+        }
+      }
+    },
+    {
+      "763375": {
+        "name": "Surge Devnet",
+        "type": "L2",
+        "icon": "https://cdn.worldvectorlogo.com/logos/ethereum-eth.svg",
+        "rpcUrls": {
+          "default": {
+            "http": ["http://3.107.178.1:8547"]
+          }
+        },
+        "nativeCurrency": {
+          "name": "ETH",
+          "symbol": "ETH",
+          "decimals": 18
+        },
+        "blockExplorers": {
+          "default": {
+            "name": "Surge Explorer",
+            "url": "http://3.107.178.1:4000"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -23,7 +23,7 @@ contract SurgeHoodiTaikoL1 is TaikoL1 {
             blockRingBufferSize: 360_000,
             maxBlocksToVerify: 4,
             blockMaxGasLimit: 200_000_000,
-            livenessBond: 10_000 ether,
+            livenessBond: 0.0007 ether,
             stateRootSyncInternal: 4,
             maxAnchorHeightOffset: 64,
             baseFeeConfig: LibSharedData.BaseFeeConfig({

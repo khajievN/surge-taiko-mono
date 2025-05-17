@@ -17,7 +17,7 @@ contract HeklaTaikoL1 is TaikoL1 {
             blockRingBufferSize: 324_512,
             maxBlocksToVerify: 16,
             blockMaxGasLimit: 240_000_000,
-            livenessBond: 0.07 ether,
+            livenessBond: 0.0007 ether,
             stateRootSyncInternal: 16,
             maxAnchorHeightOffset: 64,
             baseFeeConfig: LibSharedData.BaseFeeConfig({

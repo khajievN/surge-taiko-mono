@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import "forge-std/src/console.sol";
 import "solady/src/utils/Base64.sol";
 import "solady/src/utils/LibString.sol";
 import "src/shared/common/EssentialContract.sol";
@@ -25,7 +26,7 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
     // keccak256(hex"0ba9c4c0c0c86193a3fe23d6b02cda10a8bbd4e88e48b4458561a36e705525f567918e2edc88e40d860bd0cc4ee26aacc988e505a953558c453f6b0904ae7394")
     // the uncompressed (0x04) prefix is not included in the pubkey pre-image
     bytes32 internal constant ROOTCA_PUBKEY_HASH =
-        0x89f72d7c488e5b53a77c23ebcb36970ef7eb5bcf6658e9b8292cfbe4703a8473;
+    0x89f72d7c488e5b53a77c23ebcb36970ef7eb5bcf6658e9b8292cfbe4703a8473;
 
     uint8 internal constant INVALID_EXIT_CODE = 255;
 
@@ -42,7 +43,7 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
     // 0 = Quote PCKCrl
     // 1 = RootCrl
     mapping(uint256 idx => mapping(bytes serialNum => bool revoked)) public serialNumIsRevoked; // slot
-        // 6
+    // 6
     // fmspc => tcbInfo
     mapping(string fmspc => TCBInfoStruct.TCBInfo tcbInfo) public tcbInfo; // slot 7
     EnclaveIdStruct.EnclaveId public qeIdentity; // takes 4 slots, slot 8,9,10,11
@@ -65,8 +66,8 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
         address sigVerifyLibAddr,
         address pemCertLibAddr
     )
-        external
-        initializer
+    external
+    initializer
     {
         __Essential_init(owner);
         sigVerifyLib = ISigVerifyLib(sigVerifyLibAddr);
@@ -87,8 +88,8 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
         uint256 index,
         bytes[] calldata serialNumBatch
     )
-        external
-        onlyOwner
+    external
+    onlyOwner
     {
         for (uint256 i; i < serialNumBatch.length; ++i) {
             if (serialNumIsRevoked[index][serialNumBatch[i]]) {
@@ -103,8 +104,8 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
         uint256 index,
         bytes[] calldata serialNumBatch
     )
-        external
-        onlyOwner
+    external
+    onlyOwner
     {
         for (uint256 i; i < serialNumBatch.length; ++i) {
             if (!serialNumIsRevoked[index][serialNumBatch[i]]) {
@@ -119,8 +120,8 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
         string calldata fmspc,
         TCBInfoStruct.TCBInfo calldata tcbInfoInput
     )
-        public
-        onlyOwner
+    public
+    onlyOwner
     {
         // 2.2M gas
         tcbInfo[fmspc] = tcbInfoInput;
@@ -128,8 +129,8 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
     }
 
     function configureQeIdentityJson(EnclaveIdStruct.EnclaveId calldata qeIdentityInput)
-        external
-        onlyOwner
+    external
+    onlyOwner
     {
         // 250k gas
         qeIdentity = qeIdentityInput;
@@ -142,15 +143,15 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
     }
 
     function _attestationTcbIsValid(TCBInfoStruct.TCBStatus status)
-        internal
-        pure
-        virtual
-        returns (bool valid)
+    internal
+    pure
+    virtual
+    returns (bool valid)
     {
         return status == TCBInfoStruct.TCBStatus.OK
-            || status == TCBInfoStruct.TCBStatus.TCB_SW_HARDENING_NEEDED
-            || status == TCBInfoStruct.TCBStatus.TCB_CONFIGURATION_AND_SW_HARDENING_NEEDED
-            || status == TCBInfoStruct.TCBStatus.TCB_OUT_OF_DATE
+        || status == TCBInfoStruct.TCBStatus.TCB_SW_HARDENING_NEEDED
+        || status == TCBInfoStruct.TCBStatus.TCB_CONFIGURATION_AND_SW_HARDENING_NEEDED
+        || status == TCBInfoStruct.TCBStatus.TCB_OUT_OF_DATE
             || status == TCBInfoStruct.TCBStatus.TCB_OUT_OF_DATE_CONFIGURATION_NEEDED;
     }
 
@@ -182,7 +183,7 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
 
         // Step 1: Parse the quote input = 152k gas
         (bool successful, V3Struct.ParsedV3QuoteStruct memory parsedV3Quote) =
-            V3Parser.parseInput(quote, address(pemCertLib));
+                            V3Parser.parseInput(quote, address(pemCertLib));
         if (!successful) {
             return (false, retData);
         }
@@ -191,9 +192,9 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
     }
 
     function _verifyQEReportWithIdentity(V3Struct.EnclaveReport memory quoteEnclaveReport)
-        private
-        view
-        returns (bool, EnclaveIdStruct.EnclaveIdStatus status)
+    private
+    view
+    returns (bool, EnclaveIdStruct.EnclaveIdStatus status)
     {
         EnclaveIdStruct.EnclaveId memory enclaveId = qeIdentity;
         bool miscselectMatched =
@@ -216,7 +217,7 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
         }
         return (
             miscselectMatched && attributesMatched && mrsignerMatched && isvprodidMatched
-                && tcbFound,
+            && tcbFound,
             status
         );
     }
@@ -225,9 +226,9 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
         IPEMCertChainLib.PCKCertificateField memory pck,
         TCBInfoStruct.TCBInfo memory tcb
     )
-        private
-        pure
-        returns (bool, TCBInfoStruct.TCBStatus status)
+    private
+    pure
+    returns (bool, TCBInfoStruct.TCBStatus status)
     {
         for (uint256 i; i < tcb.tcbLevels.length; ++i) {
             TCBInfoStruct.TCBLevelObj memory current = tcb.tcbLevels[i];
@@ -248,9 +249,9 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
         uint256[] memory pckCpuSvns,
         uint8[] memory tcbCpuSvns
     )
-        private
-        pure
-        returns (bool)
+    private
+    pure
+    returns (bool)
     {
         if (pckCpuSvns.length != CPUSVN_LENGTH || tcbCpuSvns.length != CPUSVN_LENGTH) {
             return false;
@@ -264,9 +265,9 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
     }
 
     function _verifyCertChain(IPEMCertChainLib.ECSha256Certificate[] memory certs)
-        private
-        view
-        returns (bool)
+    private
+    view
+    returns (bool)
     {
         uint256 n = certs.length;
         bool certRevoked;
@@ -277,17 +278,14 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
         for (uint256 i; i < n; ++i) {
             IPEMCertChainLib.ECSha256Certificate memory issuer;
             if (i == n - 1) {
-                // rootCA
                 issuer = certs[i];
             } else {
                 issuer = certs[i + 1];
+                // revocation check
                 if (i == n - 2) {
-                    // this cert is expected to be signed by the root
-                    certRevoked = serialNumIsRevoked[uint256(IPEMCertChainLib.CRL.ROOT)][certs[i]
-                        .serialNumber];
+                    certRevoked = serialNumIsRevoked[uint256(IPEMCertChainLib.CRL.ROOT)][certs[i].serialNumber];
                 } else if (certs[i].isPck) {
-                    certRevoked =
-                        serialNumIsRevoked[uint256(IPEMCertChainLib.CRL.PCK)][certs[i].serialNumber];
+                    certRevoked = serialNumIsRevoked[uint256(IPEMCertChainLib.CRL.PCK)][certs[i].serialNumber];
                 }
                 if (certRevoked) {
                     break;
@@ -295,27 +293,34 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
             }
 
             certNotExpired =
-                block.timestamp > certs[i].notBefore && block.timestamp < certs[i].notAfter;
+                block.timestamp > certs[i].notBefore &&
+                block.timestamp < certs[i].notAfter;
             if (!certNotExpired) {
                 break;
             }
 
+            // signature check
             verified = sigVerifyLib.verifyES256Signature(
-                certs[i].tbsCertificate, certs[i].signature, issuer.pubKey
+                certs[i].tbsCertificate,
+                certs[i].signature,
+                issuer.pubKey
             );
             if (!verified) {
                 break;
             }
 
-            bytes32 issuerPubKeyHash = keccak256(issuer.pubKey);
-
-            if (issuerPubKeyHash == ROOTCA_PUBKEY_HASH) {
+            // root‐CA hash match
+            bytes32 issuerHash = keccak256(issuer.pubKey);
+            if (issuerHash == ROOTCA_PUBKEY_HASH) {
                 certChainCanBeTrusted = true;
                 break;
             }
         }
 
-        return !certRevoked && certNotExpired && verified && certChainCanBeTrusted;
+        return !certRevoked &&
+        certNotExpired &&
+        verified &&
+        certChainCanBeTrusted;
     }
 
     function _enclaveReportSigVerification(
@@ -324,19 +329,19 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
         V3Struct.ECDSAQuoteV3AuthData memory authDataV3,
         V3Struct.EnclaveReport memory qeEnclaveReport
     )
-        private
-        view
-        returns (bool)
+    private
+    view
+    returns (bool)
     {
         bytes32 expectedAuthDataHash = bytes32(qeEnclaveReport.reportData.substring(0, 32));
         bytes memory concatOfAttestKeyAndQeAuthData =
-            abi.encodePacked(authDataV3.ecdsaAttestationKey, authDataV3.qeAuthData.data);
+                            abi.encodePacked(authDataV3.ecdsaAttestationKey, authDataV3.qeAuthData.data);
         bytes32 computedAuthDataHash = sha256(concatOfAttestKeyAndQeAuthData);
 
         bool qeReportDataIsValid = expectedAuthDataHash == computedAuthDataHash;
         if (qeReportDataIsValid) {
             bytes memory pckSignedQeReportBytes =
-                V3Parser.packQEReport(authDataV3.pckSignedQeReport);
+                                V3Parser.packQEReport(authDataV3.pckSignedQeReport);
             bool qeSigVerified = sigVerifyLib.verifyES256Signature(
                 pckSignedQeReportBytes, authDataV3.qeReportSignature, pckCertPubKey
             );
@@ -371,19 +376,20 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
     /// (_attestationTcbIsValid())
     /// @dev exitCode is defined in the {{ TCBInfoStruct.TCBStatus }} enum
     function verifyParsedQuote(V3Struct.ParsedV3QuoteStruct calldata v3quote)
-        external
-        view
-        override
-        returns (bool, bytes memory)
+    external
+    view
+    override
+    returns (bool, bytes memory)
     {
         return _verifyParsedQuote(v3quote);
     }
 
     function _verifyParsedQuote(V3Struct.ParsedV3QuoteStruct memory v3quote)
-        internal
-        view
-        returns (bool, bytes memory)
+    internal
+    view
+    returns (bool, bytes memory)
     {
+        console.logString("AutomataDcapV3Attestation: _verifyParsedQuote");
         bytes memory retData = abi.encodePacked(INVALID_EXIT_CODE);
 
         // // Step 1: Parse the quote input = 152k gas
@@ -397,6 +403,7 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
         if (!successful) {
             return (false, retData);
         }
+        console.logString("Pass1: _verifyParsedQuote");
 
         // Step 2: Verify application enclave report MRENCLAVE and MRSIGNER
         {
@@ -410,24 +417,24 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
                 }
             }
         }
-
+        console.logString("Pass2: _verifyParsedQuote");
         // Step 3: Verify enclave identity = 43k gas
         EnclaveIdStruct.EnclaveIdStatus qeTcbStatus;
         {
             bool verifiedEnclaveIdSuccessfully;
             (verifiedEnclaveIdSuccessfully, qeTcbStatus) =
-                _verifyQEReportWithIdentity(v3quote.v3AuthData.pckSignedQeReport);
+            _verifyQEReportWithIdentity(v3quote.v3AuthData.pckSignedQeReport);
             if (!verifiedEnclaveIdSuccessfully) {
                 return (false, retData);
             }
             if (
                 !verifiedEnclaveIdSuccessfully
-                    || qeTcbStatus == EnclaveIdStruct.EnclaveIdStatus.SGX_ENCLAVE_REPORT_ISVSVN_REVOKED
+            || qeTcbStatus == EnclaveIdStruct.EnclaveIdStatus.SGX_ENCLAVE_REPORT_ISVSVN_REVOKED
             ) {
                 return (false, retData);
             }
         }
-
+        console.logString("Pass3: _verifyParsedQuote");
         // Step 4: Parse Quote CertChain
         IPEMCertChainLib.ECSha256Certificate[] memory parsedQuoteCerts;
         TCBInfoStruct.TCBInfo memory fetchedTcbInfo;
@@ -446,12 +453,12 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
                 }
             }
         }
-
+        console.logString("Pass4: _verifyParsedQuote");
         // Step 5: basic PCK and TCB check = 381k gas
         {
             string memory parsedFmspc = parsedQuoteCerts[0].pck.sgxExtension.fmspc;
             fetchedTcbInfo = tcbInfo[parsedFmspc];
-            bool tcbConfigured = LibString.eq(parsedFmspc, fetchedTcbInfo.fmspc);
+            bool tcbConfigured = LibString.eq(parsedFmspc, LibString.lower(fetchedTcbInfo.fmspc));
             if (!tcbConfigured) {
                 return (false, retData);
             }
@@ -462,7 +469,7 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
                 return (false, retData);
             }
         }
-
+        console.logString("Pass5: _verifyParsedQuote");
         // Step 6: Verify TCB Level
         TCBInfoStruct.TCBStatus tcbStatus;
         {
@@ -473,7 +480,7 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
                 return (false, retData);
             }
         }
-
+        console.logString("Pass6: _verifyParsedQuote");
         // Step 7: Verify cert chain for PCK
         {
             // 660k gas (rootCA pubkey is trusted)
@@ -482,7 +489,7 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
                 return (false, retData);
             }
         }
-
+        console.logString("Pass7: _verifyParsedQuote");
         // Step 8: Verify the local attestation sig and qe report sig = 670k gas
         {
             bool enclaveReportSigsVerified = _enclaveReportSigVerification(
@@ -497,6 +504,7 @@ contract AutomataDcapV3Attestation is IAttestation, EssentialContract {
         }
 
         retData = abi.encodePacked(sha256(abi.encode(v3quote)), tcbStatus);
+        console.logString("Pass8: _verifyParsedQuote");
 
         return (_attestationTcbIsValid(tcbStatus), retData);
     }

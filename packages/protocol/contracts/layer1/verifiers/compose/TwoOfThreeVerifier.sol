@@ -21,6 +21,6 @@ contract TwoOfThreeVerifier is ComposeVerifier {
         verifiers_[0] = resolve(LibStrings.B_TIER_ZKVM_RISC0, true);
         verifiers_[1] = resolve(LibStrings.B_TIER_ZKVM_SP1, true);
         verifiers_[2] = resolve(LibStrings.B_TIER_SGX, true);
-        numSubProofs_ = 2;
+        numSubProofs_ = 1;
     }
 }

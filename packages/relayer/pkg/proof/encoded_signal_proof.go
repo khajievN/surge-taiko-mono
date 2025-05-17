@@ -3,7 +3,7 @@ package proof
 import (
 	"context"
 	"math/big"
-
+	"log/slog"
 	"github.com/taikoxyz/taiko-mono/packages/relayer"
 	"github.com/taikoxyz/taiko-mono/packages/relayer/pkg/encoding"
 
@@ -31,30 +31,29 @@ func (p *Prover) EncodedSignalProofWithHops(
 	)
 }
 
-func (p *Prover) abiEncodeSignalProofWithHops(ctx context.Context,
-	hopParams []HopParams,
-) ([]byte, error) {
+func (p *Prover) abiEncodeSignalProofWithHops(ctx context.Context, hopParams []HopParams) ([]byte, error) {
+	slog.Info("Starting abiEncodeSignalProofWithHops", "numHops", len(hopParams))
+
 	hopProofs := []encoding.HopProof{}
 
-	for _, hop := range hopParams {
-		block, err := hop.Blocker.BlockByNumber(
-			ctx,
-			new(big.Int).SetUint64(hop.BlockNumber),
-		)
+	for i, hop := range hopParams {
+		slog.Info("Processing hop", "index", i, "chainID", hop.ChainID, "blockNumber", hop.BlockNumber)
+
+		block, err := hop.Blocker.BlockByNumber(ctx, new(big.Int).SetUint64(hop.BlockNumber))
 		if err != nil {
+			slog.Error("Failed to retrieve block header", "index", i, "blockNumber", hop.BlockNumber, "error", err)
 			return nil, errors.Wrap(err, "p.blockHeader")
 		}
 
-		ethProof, err := p.getProof(
-			ctx,
-			hop.Caller,
-			hop.SignalServiceAddress,
-			common.Bytes2Hex(hop.Key[:]),
-			int64(hop.BlockNumber),
-		)
+		slog.Info("Retrieved block header", "index", i, "blockNumber", block.NumberU64(), "rootHash", block.Root())
+
+		ethProof, err := p.getProof(ctx, hop.Caller, hop.SignalServiceAddress, common.Bytes2Hex(hop.Key[:]), int64(hop.BlockNumber))
 		if err != nil {
+			slog.Error("Failed to get proof", "index", i, "blockNumber", hop.BlockNumber, "error", err)
 			return nil, errors.Wrap(err, "hop p.getEncodedMerkleProof")
 		}
+
+		slog.Info("Retrieved proof", "index", i, "blockNumber", hop.BlockNumber)
 
 		hopProofs = append(hopProofs, encoding.HopProof{
 			BlockID:      block.NumberU64(),
@@ -63,14 +62,18 @@ func (p *Prover) abiEncodeSignalProofWithHops(ctx context.Context,
 			CacheOption:  encoding.CACHE_NOTHING,
 			AccountProof: ethProof.AccountProof,
 			StorageProof: ethProof.StorageProof[0].Proof,
-		},
-		)
+		})
 	}
+
+	slog.Info("Encoding hop proofs", "numProofs", len(hopProofs))
 
 	encodedSignalProof, err := encoding.EncodeHopProofs(hopProofs)
 	if err != nil {
+		slog.Error("Failed to encode hop proofs", "error", err)
 		return nil, errors.Wrap(err, "enoding.EncodeHopProofs")
 	}
+
+	slog.Info("Successfully encoded signal proof", "encodedLength", len(encodedSignalProof))
 
 	return encodedSignalProof, nil
 }

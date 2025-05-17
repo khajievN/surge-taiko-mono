@@ -19,6 +19,6 @@ contract ZkAndTeeVerifier is ComposeVerifier {
         verifiers_ = new address[](2);
         verifiers_[0] = resolve(LibStrings.B_TIER_TEE_ANY, false);
         verifiers_[1] = resolve(LibStrings.B_TIER_ZKVM_ANY, false);
-        numSubProofs_ = 2;
+        numSubProofs_ = 1;
     }
 }

@@ -77,7 +77,7 @@ contract DeploySurgeOnL1 is DeployCapability {
         address timelockController = address(
             new SurgeTimelockedController(minLivenessStreak, timelockPeriod, proposers, executors, address(0))
         );
-        address contractOwner = timelockController;
+        address contractOwner = ownerMultisig;
 
         console2.log("contractOwner(timelocked): ", contractOwner);
 

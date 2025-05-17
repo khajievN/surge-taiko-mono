@@ -76,7 +76,7 @@ func (p *Processor) processMessage(
 		return false, 0, errors.New("empty message body")
 	}
 
-	slog.Info("message received", "srcTxHash", msgBody.Event.Raw.TxHash.Hex())
+	slog.Info("message received", "srcTxHash111", msgBody.Event.Raw.TxHash.Hex())
 
 	// check if we already processing this hash
 	checkHash := func(hash common.Hash) error {
@@ -92,7 +92,7 @@ func (p *Processor) processMessage(
 
 		return nil
 	}
-
+	slog.Info("processing message")
 	// if we are, we dont need to continue
 	if err := checkHash(msgBody.Event.Raw.TxHash); err != nil {
 		return false, 0, err
@@ -104,7 +104,7 @@ func (p *Processor) processMessage(
 		defer p.processingTxHashMu.Unlock()
 		delete(p.processingTxHashes, hash)
 	}(msgBody.Event.Raw.TxHash)
-
+	slog.Info("processing message maxMessageRetries")
 	if msgBody.TimesRetried >= p.maxMessageRetries {
 		slog.Warn("max retries reached", "timesRetried", msgBody.TimesRetried)
 
@@ -122,13 +122,13 @@ func (p *Processor) processMessage(
 
 		return false, msgBody.TimesRetried, nil
 	}
-
+	slog.Info("processing message minFeeToProcess")
 	// check message process eligibility before waiting for confirmations to process
 	eventStatus, err := p.eventStatusFromMsgHash(ctx, msgBody.Event.MsgHash)
 	if err != nil {
 		return false, msgBody.TimesRetried, errors.Wrap(err, "p.eventStatusFromMsgHash")
 	}
-
+	slog.Info("processing message eventStatusFromMsgHash")
 	if !canProcessMessage(
 		ctx,
 		eventStatus,
@@ -138,11 +138,11 @@ func (p *Processor) processMessage(
 	) {
 		return false, msgBody.TimesRetried, nil
 	}
-
+	slog.Info("processing message waitForConfirmations")
 	if err := p.waitForConfirmations(ctx, msgBody.Event.Raw.TxHash); err != nil {
 		return false, msgBody.TimesRetried, err
 	}
-
+	slog.Info("processing message waitForConfirmations done")
 	// check paused status
 	paused, err := p.destBridge.Paused(&bind.CallOpts{
 		Context: ctx,
@@ -155,7 +155,7 @@ func (p *Processor) processMessage(
 	if paused {
 		return true, msgBody.TimesRetried, nil
 	}
-
+	slog.Info("processing message Paused")
 	// destQuotaManager is optional, it will not be set for L1-L2 bridging
 	// but will be set for L2-L1 bridging.
 	if p.destQuotaManager != nil {
@@ -196,17 +196,17 @@ func (p *Processor) processMessage(
 			}
 		}
 	}
-
+	slog.Info("processing message generateEncodedSignalProof")
 	encodedSignalProof, err := p.generateEncodedSignalProof(ctx, msgBody.Event)
 	if err != nil {
 		return false, msgBody.TimesRetried, err
 	}
-
+	slog.Info("processing message sendProcessMessageCall")
 	_, err = p.sendProcessMessageCall(ctx, msgBody.ID, msgBody.Event, encodedSignalProof)
 	if err != nil {
 		return strings.Contains(err.Error(), "nonce too low"), msgBody.TimesRetried, err
 	}
-
+	slog.Info("processing message MessageStatus")
 	messageStatus, err := p.destBridge.MessageStatus(&bind.CallOpts{
 		Context: ctx,
 	}, msgBody.Event.MsgHash)
@@ -225,7 +225,7 @@ func (p *Processor) processMessage(
 	} else if messageStatus == uint8(relayer.EventStatusDone) {
 		relayer.DoneEvents.Inc()
 	}
-
+	slog.Info("processing message EventStatusRetriable")
 	// internal will only be set if it's an actual queue message, not a targeted
 	// transaction hash set via config flag.
 	if msg.Internal != nil {
@@ -243,67 +243,78 @@ func (p *Processor) processMessage(
 // as well as any additional hops required.
 func (p *Processor) generateEncodedSignalProof(ctx context.Context,
 	event *bridge.BridgeMessageSent) ([]byte, error) {
+	slog.Info("Starting generateEncodedSignalProof", "blockNum", event.Raw.BlockNumber)
+
 	var encodedSignalProof []byte
-
 	var err error
-
 	var blockNum uint64 = event.Raw.BlockNumber
+
+	// Log the number of hops
+	slog.Info("Checking hops", "hopsCount", len(p.hops))
 
 	// wait for srcChain => destChain header to sync if no hops,
 	// or srcChain => hopChain => hopChain => hopChain => destChain if hops exist.
 	if len(p.hops) > 0 {
 		var hopEthClient ethClient = p.srcEthClient
-
 		var hopChainID *big.Int
 
 		for _, hop := range p.hops {
-			event, err := p.waitHeaderSynced(ctx, hopEthClient, hop.chainID.Uint64(), blockNum)
+			slog.Info("Waiting for header sync", "hopChainID", hop.chainID.Uint64(), "blockNum", blockNum)
 
+			event, err := p.waitHeaderSynced(ctx, hopEthClient, hop.chainID.Uint64(), blockNum)
 			if err != nil {
+				slog.Error("Error during waitHeaderSynced", "error", err)
 				return nil, errors.Wrap(err, "p.waitHeaderSynced")
 			}
 
 			blockNum = event.SyncedInBlockID
-
 			hopEthClient = hop.ethClient
-
 			hopChainID = hop.chainID
 		}
 
+		slog.Info("Final header sync for last hop", "hopChainID", hopChainID.Uint64(), "blockNum", blockNum)
 		event, err := p.waitHeaderSynced(ctx, hopEthClient, hopChainID.Uint64(), blockNum)
 		if err != nil {
+			slog.Error("Error during final waitHeaderSynced", "error", err)
 			return nil, err
 		}
 
 		blockNum = event.SyncedInBlockID
 	} else {
+		slog.Info("No hops, syncing srcChain to destChain", "blockNum", blockNum)
 		if _, err := p.waitHeaderSynced(ctx, p.srcEthClient, p.destChainId.Uint64(), event.Raw.BlockNumber); err != nil {
+			slog.Error("Error during waitHeaderSynced for srcChain to destChain", "error", err)
 			return nil, err
 		}
+	slog.Info("waitHeaderSynced completed222")
 	}
-
+	slog.Info("waitHeaderSynced completed111")
 	hops := []proof.HopParams{}
+	slog.Info("Fetching signal slot", "srcChainID", event.Message.SrcChainId, "address", event.Raw.Address.Hex())
 
 	key, err := p.srcSignalService.GetSignalSlot(&bind.CallOpts{},
 		event.Message.SrcChainId,
 		event.Raw.Address,
 		event.MsgHash,
 	)
-
 	if err != nil {
+		slog.Error("Error fetching signal slot", "error", err)
 		return nil, err
 	}
 
+	// Log the key retrieved
+	slog.Info("Signal slot key retrieved", "key", key)
+
 	// if we have no hops, this is strictly a srcChain => destChain message.
-	// we can grab the latestBlockID, create a singular "hop" of srcChain => destChain,
-	// and generate a proof.
 	if len(p.hops) == 0 {
+		slog.Info("No hops, creating single hop proof")
 		latestBlockID, err := p.eventRepo.LatestChainDataSyncedEvent(
 			ctx,
 			p.destChainId.Uint64(),
 			p.srcChainId.Uint64(),
 		)
 		if err != nil {
+			slog.Error("Error fetching latest chain data synced event", "error", err)
 			return nil, err
 		}
 
@@ -317,8 +328,7 @@ func (p *Processor) generateEncodedSignalProof(ctx context.Context,
 			BlockNumber:          latestBlockID,
 		})
 	} else {
-		// otherwise, we should just create the first hop in the array, we will append
-		// the rest of the hops after.
+		slog.Info("Creating first hop in the array")
 		hops = append(hops, proof.HopParams{
 			ChainID:              p.destChainId,
 			SignalServiceAddress: p.srcSignalServiceAddress,
@@ -330,21 +340,18 @@ func (p *Processor) generateEncodedSignalProof(ctx context.Context,
 		})
 	}
 
-	// if a hop is set, the proof service needs to generate an additional proof
-	// for the signal service intermediary chain in between the source chain
-	// and the destination chain.
+	// Log the hops being processed
+	slog.Info("Processing hops", "hopsCount", len(p.hops))
+
 	for _, hop := range p.hops {
-		slog.Info(
-			"adding hop",
-			"hopChainId", hop.chainID.Uint64(),
-			"hopSignalServiceAddress", hop.signalServiceAddress.Hex(),
-		)
+		slog.Info("Adding hop", "hopChainID", hop.chainID.Uint64(), "hopSignalServiceAddress", hop.signalServiceAddress.Hex())
 
 		block, err := hop.ethClient.BlockByNumber(
 			ctx,
 			new(big.Int).SetUint64(blockNum),
 		)
 		if err != nil {
+			slog.Error("Error fetching block by number", "error", err)
 			return nil, err
 		}
 
@@ -356,6 +363,7 @@ func (p *Processor) generateEncodedSignalProof(ctx context.Context,
 			block.Root(),
 		)
 		if err != nil {
+			slog.Error("Error fetching hop signal slot", "error", err)
 			return nil, errors.Wrap(err, "hopSignalService.GetSignalSlot")
 		}
 
@@ -370,13 +378,13 @@ func (p *Processor) generateEncodedSignalProof(ctx context.Context,
 		})
 	}
 
+	slog.Info("Generating encoded signal proof", "hopsLength", len(hops))
 	encodedSignalProof, err = p.prover.EncodedSignalProofWithHops(
 		ctx,
 		hops,
 	)
-
 	if err != nil {
-		slog.Error("error encoding hop proof",
+		slog.Error("Error encoding hop proof",
 			"srcChainID", event.Message.SrcChainId,
 			"destChainID", event.Message.DestChainId,
 			"txHash", event.Raw.TxHash.Hex(),
@@ -387,13 +395,12 @@ func (p *Processor) generateEncodedSignalProof(ctx context.Context,
 			"error", err,
 			"hopsLength", len(hops),
 		)
-
 		return nil, err
 	}
 
+	slog.Info("Successfully generated encoded signal proof")
 	return encodedSignalProof, nil
 }
-
 // sendProcessMessageCall calls `bridge.processMessage` with latest nonce
 // after estimating gas, and checking profitability.
 func (p *Processor) sendProcessMessageCall(
@@ -404,6 +411,10 @@ func (p *Processor) sendProcessMessageCall(
 ) (*types.Receipt, error) {
 	defer p.logRelayerBalance(ctx)
 
+	slog.Info("Checking if message is received",
+        "message", event.Message,
+        "proof", hex.EncodeToString(proof),
+    )
 	received, err := p.destBridge.IsMessageReceived(nil, event.Message, proof)
 	if err != nil {
 		return nil, err

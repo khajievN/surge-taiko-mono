@@ -25,7 +25,7 @@ contract MainnetTaikoL1 is TaikoL1, RollupAddressCache {
             blockRingBufferSize: 360_000, // DO NOT CHANGE!!!
             maxBlocksToVerify: 16,
             blockMaxGasLimit: 240_000_000,
-            livenessBond: 0.07 ether,
+            livenessBond: 0.0007 ether,
             stateRootSyncInternal: 16,
             maxAnchorHeightOffset: 64,
             baseFeeConfig: LibSharedData.BaseFeeConfig({

@@ -821,39 +821,45 @@ func (c *Client) GetTiers(ctx context.Context) ([]*TierProviderTierWithID, error
 	defer cancel()
 
 	tierRouterAddress, err := c.TaikoL1.Resolve0(&bind.CallOpts{Context: ctx}, StringToBytes32("tier_router"), false)
+	log.Debug("tierRouterAddress")
 	if err != nil {
 		return nil, err
 	}
 
 	tierRouter, err := bindings.NewTierProvider(tierRouterAddress, c.L1)
+	log.Debug("tierRouter")
 	if err != nil {
 		return nil, err
 	}
 
 	providerAddress, err := tierRouter.GetProvider(&bind.CallOpts{Context: ctxWithTimeout}, common.Big0)
+	log.Debug("providerAddress")
 	if err != nil {
 		return nil, err
 	}
 
 	tierProvider, err := bindings.NewTierProvider(providerAddress, c.L1)
+	log.Debug("tierProvider")
 	if err != nil {
 		return nil, err
 	}
 
 	ids, err := tierProvider.GetTierIds(&bind.CallOpts{Context: ctxWithTimeout})
+	log.Debug("ids")
 	if err != nil {
 		return nil, err
 	}
 	if len(ids) == 0 {
 		return nil, errEmptyTiersList
 	}
-
+	log.Debug("tiers")
 	var tiers []*TierProviderTierWithID
 	for _, id := range ids {
 		tier, err := tierProvider.GetTier(&bind.CallOpts{Context: ctxWithTimeout}, id)
 		if err != nil {
 			return nil, err
 		}
+		log.Debug("tiers1111")
 		tiers = append(tiers, &TierProviderTierWithID{ID: id, ITierProviderTier: tier})
 	}
 

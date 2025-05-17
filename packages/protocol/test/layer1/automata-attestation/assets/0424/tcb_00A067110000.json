@@ -1,12 +1,12 @@
 {
   "tcbInfo": {
     "version": 2,
-    "issueDate": "2024-04-23T11:53:30Z",
-    "nextUpdate": "2024-05-23T11:53:30Z",
-    "fmspc": "00a067110000",
+    "issueDate": "2025-05-01T06:03:53Z",
+    "nextUpdate": "2025-05-31T06:03:53Z",
+    "fmspc": "00A067110000",
     "pceId": "0000",
     "tcbType": 0,
-    "tcbEvaluationDataNumber": 16,
+    "tcbEvaluationDataNumber": 17,
     "tcbLevels": [
       {
         "tcb": {
@@ -28,7 +28,7 @@
           "sgxtcbcomp16svn": 0,
           "pcesvn": 13
         },
-        "tcbDate": "2023-08-09T00:00:00Z",
+        "tcbDate": "2024-03-13T00:00:00Z",
         "tcbStatus": "SWHardeningNeeded"
       },
       {
@@ -51,7 +51,7 @@
           "sgxtcbcomp16svn": 0,
           "pcesvn": 13
         },
-        "tcbDate": "2023-08-09T00:00:00Z",
+        "tcbDate": "2024-03-13T00:00:00Z",
         "tcbStatus": "ConfigurationAndSWHardeningNeeded"
       },
       {
@@ -75,7 +75,7 @@
           "pcesvn": 13
         },
         "tcbDate": "2023-02-15T00:00:00Z",
-        "tcbStatus": "OutOfDateConfigurationNeeded"
+        "tcbStatus": "OutOfDate"
       },
       {
         "tcb": {
@@ -121,7 +121,7 @@
           "pcesvn": 13
         },
         "tcbDate": "2022-11-09T00:00:00Z",
-        "tcbStatus": "OutOfDateConfigurationNeeded"
+        "tcbStatus": "OutOfDate"
       },
       {
         "tcb": {
@@ -167,7 +167,7 @@
           "pcesvn": 11
         },
         "tcbDate": "2021-11-10T00:00:00Z",
-        "tcbStatus": "OutOfDateConfigurationNeeded"
+        "tcbStatus": "OutOfDate"
       },
       {
         "tcb": {
@@ -190,7 +190,7 @@
           "pcesvn": 10
         },
         "tcbDate": "2020-11-11T00:00:00Z",
-        "tcbStatus": "OutOfDateConfigurationNeeded"
+        "tcbStatus": "OutOfDate"
       },
       {
         "tcb": {
@@ -259,9 +259,9 @@
           "pcesvn": 5
         },
         "tcbDate": "2018-01-04T00:00:00Z",
-        "tcbStatus": "OutOfDateConfigurationNeeded"
+        "tcbStatus": "OutOfDate"
       }
     ]
   },
-  "signature": "acd2ac648c99bfa2e15fbbbcc337da3b6e226f9799cf841342a5350bd78f7bdbfeec5fa9fb1181e615a0a425d78a20b2933d4e523d571e77aa73ca0cfe23742e"
+  "signature": "7d2be80fe3d07172bb628952ec98e107842566e379a5515618f6fc77bb8d2d6dde7974f03eb12d2133a1e86631a49a40832e15d9dc424624d7eed534b29be713"
 }
