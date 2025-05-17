@@ -45,7 +45,7 @@
     "svelte-check": "^3.7.1",
     "svelte-copy": "^1.4.2",
     "svelte-i18n": "^4.0.0",
-    "svelte-scrolling": "^1.4.0",
+    "svelte-scrolling": "^1.5.1",
     "tailwindcss-image-rendering": "^1.0.2",
     "tslib": "^2.4.1",
     "typescript": "^5.0.0",
